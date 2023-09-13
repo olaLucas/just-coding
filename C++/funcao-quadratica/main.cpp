@@ -61,7 +61,7 @@ data_type raizQuadrada(data_type b, data_type delta)
         int pwr = 1;
         int b_pwr = power(b, 2);
 
-        while ((pwr * pwr) != b) // deixa lento, eu sei.
+        while ((pwr * pwr) != b)
         {
             pwr++;
         }
@@ -156,7 +156,6 @@ int main(void)
         defineRaiz(a, b, c, delta, &x1, &x2);
         display(a, b, c, delta, x1, x2);
     }
-
 
     return 0;
 }

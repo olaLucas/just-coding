@@ -20,4 +20,3 @@ class gui(customtkinter.CTk):
 
 janela = gui()
 janela.mainloop()
-        
