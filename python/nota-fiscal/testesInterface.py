@@ -26,6 +26,10 @@ class emissaoFrame(customtkinter.CTkFrame):
                 self, text=self.servicoLabels[i], value=self.servicoLabels[i], variable=self.servicoRadioVar, command=self.servicoFunction)
             self.servicoRadios.grid(row=1, column=i, padx=10, pady=5)
             self.servicoRadios.grid(sticky="ne")
+
+    def servicoFunction():
+        print("Hello world")
+
             
         # Textbox widget e label
         self.labelDISCRIMINACAO = customtkinter.CTkLabel(
@@ -246,7 +250,7 @@ class Gui(customtkinter.CTk):
             cliente.getValues(self.tabFrame.returnClienteValues())
 
             
-cliente = cliente()
-nota = nota()
+#cliente = cliente()
+#nota = nota()
 janela = Gui()
 janela.mainloop()

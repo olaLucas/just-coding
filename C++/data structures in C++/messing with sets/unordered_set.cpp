@@ -56,11 +56,13 @@ namespace menu
     void mainPrompt(unordered_set<pessoa> * hash_table);
     unsigned int getInput();
     void clean();
+    void pause();
 }
 
 namespace uset
 {
-    void display_dados(unordered_set<pessoa> hash_table);
+    void percorre_set(unordered_set<pessoa> hash_table);
+    void display_elementos(const pessoa temp);
     void pesquisar_dados(unordered_set<pessoa> hash_table);
     void inserir_dados(unordered_set<pessoa> hash_table);
     void excluir_dados(unordered_set<pessoa> * hash_table);
@@ -95,7 +97,7 @@ void menu::mainPrompt(unordered_set<pessoa> * hash_table)
             break;
 
         case 2:
-            uset::display_dados(*hash_table);
+            uset::percorre_set(*hash_table);
             break;
 
         case 3:
@@ -129,9 +131,13 @@ void menu::clean()
     while ((c = getchar()) != '\n');
 }
 
+void menu::pause()
+{
+    clean();
+    getchar();
+}
 
-
-void uset::display_dados(unordered_set<pessoa> hash_table)
+void uset::percorre_set(unordered_set<pessoa> hash_table)
 {
     if (hash_table.empty())
     {
@@ -141,17 +147,23 @@ void uset::display_dados(unordered_set<pessoa> hash_table)
     {
         cout << "-----------------------" << endl;
         unsigned int count = 0;
-        for (auto i : hash_table)
+        for (auto i = hash_table.begin(); i != hash_table.end(); i++)
         {
             count++;
-            cout << "ID: " << count << endl;
-            cout << "Nome: " << i.nome << endl;
-            cout << "Idade: " << i.idade << endl;
-            cout << "CPF: " << i.CPF << endl;
+            display_elementos(*i);
         }
 
         cout << "-----------------------" << endl;
+
+        menu::pause();
     }
+}
+
+void uset::display_elementos(const pessoa temp)
+{
+    cout << "Nome: " << temp.nome << endl;
+    cout << "Idade: " << temp.idade << endl;
+    cout << "CPF: " << temp.CPF << endl;
 }
 
 void uset::pesquisar_dados(unordered_set<pessoa> hash_table)
@@ -162,26 +174,20 @@ void uset::pesquisar_dados(unordered_set<pessoa> hash_table)
     }
     else
     {
-        string CPF_TEMP;
+        pessoa temp;
         const auto & copy = hash_table;
 
         cout << "Informe o CPF da pessoa: " << endl;
-        getline(cin, CPF_TEMP);
+        getline(cin, temp.CPF);
 
-        pessoa temp;
-        temp.CPF = CPF_TEMP;
-
-        auto found = copy.find(temp);
-
-        if (found == copy.end()) 
+        if (auto found = copy.find(temp); found == copy.end()) 
         {
             cout << "Não encontrado.";
         } 
         else 
         {
-            cout << "Nome: " << found->nome;
-            cout << "Idade: " << found->idade;
-            cout << "CPF: " << found->CPF;
+            display_elementos(*found);
+            menu::pause();
         } 
     }
 }
