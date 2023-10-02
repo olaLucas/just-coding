@@ -12,7 +12,7 @@ int counter = 1;
 void inicializar();
 void inserir(ptr_node inicio);
 void excluir(ptr_node inicio);
-void exibir(ptr_node inicio);
+void exibir_arvore(ptr_node inicio);
 void menu();
 void cleanBuffer();
 void procedimento(int num);
@@ -31,7 +31,7 @@ void menu()
     while (seletor != 0)
     {
         system("clear");
-        exibir(inicio);
+        exibir_arvore(inicio);
         
         printf("\nSelecione uma opção: \n\n");
         printf("1. Inserir dados.\n");
@@ -54,7 +54,7 @@ void menu()
             break;
 
         case 3:
-            exibir(inicio);
+            exibir_arvore(inicio);
             break;
 
         case 4:
@@ -155,7 +155,7 @@ void excluir(ptr_node inicio)
     }
 }
 
-void exibir(ptr_node inicio)
+void exibir_arvore(ptr_node inicio)
 {   
     if (counter == 1)
     {

@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/main.dir/main.cpp.o -o main   -L"/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/libs"  -Wl,-rpath,"/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/libs" libs/libRaizQuadrada.a 

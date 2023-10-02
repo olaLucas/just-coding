@@ -1,0 +1,2 @@
+/usr/bin/ar qc libRaizQuadrada.a CMakeFiles/RaizQuadrada.dir/raizQuadrada.cpp.o
+/usr/bin/ranlib libRaizQuadrada.a
