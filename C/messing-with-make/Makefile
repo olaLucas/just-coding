@@ -1,10 +1,6 @@
-TARGET = main
-sources_libs = libs/
-sources_code = codes/
-output = binaries/
-
 # o '!=' permite chamar um shell function e definir o retorno dessa função para à variavel
 objects = main.o binary_tree.o 
+TARGET = main
 
 clean : default
 	rm -f *.o
