@@ -1,0 +1,7 @@
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/CMakeFiles/main.dir
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/CMakeFiles/iostream.dir
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/CMakeFiles/edit_cache.dir
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/CMakeFiles/rebuild_cache.dir
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/libs/CMakeFiles/RaizQuadrada.dir
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/libs/CMakeFiles/edit_cache.dir
+/media/dio/code/git repositories/just-coding/C++/messing-with-cmake/build/libs/CMakeFiles/rebuild_cache.dir

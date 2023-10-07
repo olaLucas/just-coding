@@ -1,0 +1,7 @@
+# ninja log v5
+401	665	1696281527674974114	libs/CMakeFiles/RaizQuadrada.dir/raizQuadrada.cpp.o	3f2a77dac7559b5c
+680	752	1696281527762974089	main	721e3cbdaf088dbd
+401	674	1696281527682974112	CMakeFiles/iostream.dir/main.cpp.o	968a7a9f0db849c4
+665	679	1696281527690974110	libs/libRaizQuadrada.a	7f34c30b722a2b9
+400	680	1696281527690974110	CMakeFiles/main.dir/main.cpp.o	dc6dd1e02f6dd9f0
+674	686	1696281527694974109	libiostream.a	28fc32f3f317488b
