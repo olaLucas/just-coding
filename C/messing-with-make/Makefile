@@ -2,10 +2,10 @@
 objects = main.o binary_tree.o 
 TARGET = main
 
-clean : default
+clean : 
 	rm -f *.o
 
-default : $(objects) 
+default : $(objects)
 	cc -g $(objects) -o binaries/main
 
 binary_tree.o : libs/binary_tree.c
