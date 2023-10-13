@@ -17,7 +17,7 @@ namespace pessoa
 {
     typedef struct pessoa_struct
     {
-        string HASH;
+        string hash;
         string nome;
         unsigned int idade;
         std::hash <string> hashFunction;
@@ -38,17 +38,18 @@ namespace pessoa
         void hash_nome()
         {
             if (nome.empty())
-                cout << "Campo nome vazio." << endl;
+                return;
             else
-                HASH = std::to_string(hashFunction(nome));
+                hash = std::to_string(hashFunction(nome));
         }
 
     } pessoa_struct;
 
+    // funções necessárias para converter JSON -> struct | struct -> JSON
     void to_json(json &j, const pessoa_struct &p)
     {
         j = json {
-            {"hash", p.HASH},
+            {"hash", p.hash},
             {"nome", p.nome},
             {"idade", p.idade}
         };
@@ -56,7 +57,7 @@ namespace pessoa
 
     void from_json(const json &j, pessoa_struct &p)
     {
-        j.at("hash").get_to(p.HASH);
+        j.at("hash").get_to(p.hash);
         j.at("nome").get_to(p.nome);
         j.at("idade").get_to(p.idade);
     }
@@ -74,48 +75,59 @@ struct std::hash <pessoa::pessoa_struct>
     }
 };
 
-void inserir_umap(
+void insert_umap(
         unordered_map <string, pessoa::pessoa_struct> * umap, 
-        string nomePARAM, unsigned int idadePARAM
+        pessoa::pessoa_struct p
     )
 {
-    pessoa::pessoa_struct temp {nomePARAM, idadePARAM};
+    if (p.nome == "" && p.idade == 0)
+    {
+        cout << "struct vazia" << endl;
+        return;
+    }
     
-    // temp.hash_nome();
-
-    umap->insert({temp.HASH, temp});
+    umap->insert({p.hash, p});
 }
 
 void read_data(unordered_map <string, pessoa::pessoa_struct> * umap)
 {
     json j;
     std::ifstream file(FILE_PATH);
+    pessoa::pessoa_struct p;
 
     j = json::parse(file);
     if (j.empty())
     {
         cout << "File empty." << endl;
-    }
-    else
-    {
-        for (auto i = umap->begin(); i != umap->end(); i++)
-        {
-            // umap->insert({j.get});
-        }
+        return;
     }
     
+    for (auto& i : j)
+    {
+        p = i;
+        umap->insert({p.hash, p});
+    }
+    
+    for (auto& [key, value] : *umap)
+    {
+        cout << "HASH: " << value.hash << endl;
+        cout << "NOME: " << value.nome << endl;
+        cout << "IDADE: " << value.idade << endl;
+    }
 }
 
 void store_data(unordered_map <string, pessoa::pessoa_struct> * umap)
 {
     json j;
-    pessoa::pessoa_struct p;
     std::ofstream file(FILE_PATH);
-    for (auto i = umap->begin(); i != umap->end(); i++)
+    for (auto& [key, value] : *umap)
     {
-        j["pessoa"][i->first] = {
-            {"nome", i->second.nome}, 
-            {"idade", i->second.idade}
+        j[value.nome] = {
+            
+            {"hash", key},
+            {"nome", value.nome},
+            {"idade", value.idade}
+            
         };
     }
     
@@ -126,10 +138,12 @@ void store_data(unordered_map <string, pessoa::pessoa_struct> * umap)
 int main(void)
 {
     unordered_map <string, pessoa::pessoa_struct> umap;
-    inserir_umap(&umap, "luc", 20);
-    inserir_umap(&umap, "rafael", 30);
-    inserir_umap(&umap, "leonardo", 40);
+    insert_umap(&umap, {"Lucas Santos", 20});
+    insert_umap(&umap, {"Leoanardo Peixoto", 19});
+    insert_umap(&umap, {"Rafael Silva", 20});
 
     store_data(&umap);
+    read_data(&umap);
+
     return 0;
 }
