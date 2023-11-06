@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int *function(int x[], int size, int newSize)
+#define SIZE_ARRAY 10
+#define NEW_SIZE 20
+
+int *function(int x[], int size, int NEW_SIZE)
 {
-    int *pointer = (int *)malloc(sizeof(int) * newSize);
+    int *pointer = (int *)malloc(sizeof(int) * NEW_SIZE);
     for (int i = 0; i < size; i++)
     {
         pointer[i] = x[i];
@@ -16,30 +19,28 @@ int *function(int x[], int size, int newSize)
 
 int main(void)
 {
-    int sizeArray = 10;
-    int newSize = 20;
-    int *pointer = (int *)malloc(sizeof(int) * sizeArray);
+    int *pointer = (int *)malloc(sizeof(int) * SIZE_ARRAY);
 
     for (int i = 0; i < 10; i++)
     {
         pointer[i] = i;
     }
 
-    for (int i = 0; i < sizeArray; i++)
+    for (int i = 0; i < SIZE_ARRAY; i++)
     {
-        printf("sizeArray: %d \n\n", pointer[i]);
+        printf("SIZE_ARRAY: %d \n\n", pointer[i]);
     }
     
-    pointer = function(pointer, sizeArray, newSize);
+    pointer = function(pointer, SIZE_ARRAY, NEW_SIZE);
 
     printf("\t -------------- \n\n");
 
-    for (int i = 10; i < newSize; i++)
+    for (int i = 10; i < NEW_SIZE; i++)
     {
         pointer[i] = i;
     }
 
-    for (int i = 0; i < newSize; i++)
+    for (int i = 0; i < NEW_SIZE; i++)
     {
         printf("newSize: %d \n\n", pointer[i]);
     }
