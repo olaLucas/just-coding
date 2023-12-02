@@ -191,7 +191,7 @@ void testingWindow(char str[])
 	WINDOW * mywin;
 	int x = 0, y = 0;
 
-	mywin = newwin((LINES / 2), (COLS / 2), 5, 5);
+	mywin = newwin((LINES / 2), (COLS / 2), 0, 0);
 	getmaxyx(mywin, y, x);
 
 	wborder(mywin, '|', '|', '-', '-', '*', '*', '*', '*');
