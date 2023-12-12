@@ -177,7 +177,7 @@ void testingAttributes()
 
 void testingchgat()
 {
-	char j[] = "hello world";
+	const char j[] = "hello world";
 
 	printw(j);
 	mvchgat(0, 0, strlen(j), A_UNDERLINE, 0, NULL);
@@ -202,12 +202,33 @@ void testingWindow(char str[])
 	delwin(mywin);
 }
 
+void testing_colors()
+{
+	if (has_colors() == false)
+	{
+		fprintf(stderr, "dont support colors\n");
+		exit(-1);
+	}
+
+	start_color();
+	init_pair(1, COLOR_BLACK, COLOR_RED);
+
+	attron(COLOR_PAIR(1));
+
+	printw("Hello World!");
+	refresh();
+	
+	attroff(COLOR_PAIR(1));
+
+	getch();
+}
+
 int main(void)
 {
 	// inicializa o terminal no modo curses
 	initscr();
 
-	testingWindow("Hello, world!");
+	printwm();
 
 	// encerra e desaloca os recursos da lib
 	endwin();

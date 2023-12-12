@@ -13,6 +13,3 @@ CCFLAGS = -g -Wall $(LIBS)
 # the recipe to make the final binary 
 main : $(SOURCES)
 	$(CC) $(SOURCES) $(CCFLAGS) -o $(TARGET) 
-
-moving : movingWindows.c
-		$(CC) movingWindows.c $(CCFLAGS) -o mov

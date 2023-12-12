@@ -197,25 +197,7 @@ char * postToString(const char URL[], const char body[], const char headers[])
 }
 
 // make an get request
-char * getToString(const char URL[])
-{
-    struct response res = initResponse();
 
-    CURL * handle = curl_easy_init();
-    curl_easy_setopt(handle, CURLOPT_URL, URL);
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, getResponseToString);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void *)&res);
-
-    CURLcode result = curl_easy_perform(handle);
-    if (result != CURLE_OK)
-    {
-        fprintf(stderr, "Error: %s\n", curl_easy_strerror(result));
-        return NULL;
-    }
-
-    curl_easy_cleanup(handle);
-    return res.data;
-}
 
 void getToFile(const char URL[], const char FILE_NAME[])
 {
