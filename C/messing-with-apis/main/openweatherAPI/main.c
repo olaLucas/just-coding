@@ -46,8 +46,8 @@ struct getData initGetData()
     struct getData gtD;
     gtD.appid = (char *)calloc(STRING_SIZE, sizeof(char));
     gtD.units = (char *)calloc(STRING_SIZE, sizeof(char));
-    gtD.lat = 0;
-    gtD.lon = 0;
+    gtD.lat = NULL;
+    gtD.lon = NULL;
 
     return gtD;
 }
@@ -88,37 +88,13 @@ void deleteGetData(struct getData * gtD)
     gtD->lon = 0;
 }
 
-
-enum {info, response};
-const char * JSON_FILE[] = {
-    "info.json",
-    "response.json"
-};
-
-const char * WEATHER_URI = "https://api.openweathermap.org/data/2.5/weather?";
-
-enum {lat, lon, appid, units};
-const char * json_keys[] = {
-    "lat",
-    "lon",
-    "appid",
-    "units"
-};
-
-const char * url_keys[] = {
-    "lat=",
-    "&lon=",
-    "&appid=",
-    "&units="
-};
-
 void getCurrentWeather()
 {
     cJSON * json;
     struct getData gtD = initGetData();
     struct getRequest gtR = initGetRequest();    
 
-    FILE * arq = fopen(JSON_FILE[info], "r");
+    FILE * arq = fopen("info.json", "r");
     if (arq == NULL)
     {
         fprintf(stderr, "Error while opening file.\n");
@@ -134,21 +110,20 @@ void getCurrentWeather()
     fread(buffer, 1, sizeof(buffer), arq);
     json = cJSON_Parse(buffer);
 
-    gtD.appid = getDynamicJSONString(json_keys[appid], buffer);
-    gtD.units = getDynamicJSONString(json_keys[units], buffer);
-    gtD.lat = getDynamicJSONString(json_keys[lat], buffer);
-    gtD.lon = getDynamicJSONString(json_keys[lon], buffer);
+    gtD.appid = getDynamicJSONString("appid", buffer);
+    gtD.units = getDynamicJSONString("units", buffer);
+    gtD.lat = getDynamicJSONString("lat", buffer);
+    gtD.lon = getDynamicJSONString("lont", buffer);
     print_getData(&gtD);
 
-    strcpy(gtR.body, WEATHER_URI);
-    addKeyValueURL(&gtR, url_keys[lat], gtD.lat);
-    addKeyValueURL(&gtR, url_keys[lon], gtD.lon);
-    addKeyValueURL(&gtR, url_keys[appid], gtD.appid);
-    addKeyValueURL(&gtR, url_keys[units], gtD.units);
+    gtR.body = makeURL(
+        "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s&units=",
+        gtD.lat, gtD.lon, gtD.appid, gtD.units
+    );
 
     fclose(arq);
 
-    getToJSON(gtR.body, JSON_FILE[response]);
+    getToJSONFile(gtR.body, "response.json");
 
     free(buffer);
     deleteGetRequest(&gtR);
@@ -166,7 +141,7 @@ struct currentWeather readCurrentWeather()
 
     struct currentWeather cW;
     char * buffer;
-    FILE * arq = fopen(JSON_FILE[response], "r");
+    FILE * arq = fopen("response.json", "r");
     if (arq == NULL)
     {
         fprintf(stderr, "Error while opening file.");
