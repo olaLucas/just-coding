@@ -75,10 +75,9 @@ struct response
     size_t size;
 };
 
+
 typedef struct fileStruct fileStruct;
-typedef struct getRequest getRequest;
-typedef struct getData getData;
-typedef struct response responseStruct;
+
 
 struct getData initGetData()
 {
@@ -90,47 +89,6 @@ struct getData initGetData()
 
     return gtD;
 }
-
-void print_getData(struct getData * gtD)
-{
-    printf("lon: %s\n", gtD->lon);
-    printf("lat: %s\n", gtD->lat);
-    printf("appid: %s\n", gtD->appid);
-    printf("units: %s\n", gtD->units);
-}
-
-void deleteGetData(struct getData * gtD)
-{
-    if (gtD->appid != NULL)
-        free(gtD->appid);
-    if (gtD->units != NULL)
-        free(gtD->units);
-    gtD->lat = 0;
-    gtD->lon = 0;
-}
-
-
-struct getRequest initGetRequest()
-{
-    struct getRequest x;
-    x.body = (char *)calloc(STRING_SIZE, sizeof(char));
-    x.bodySize = STRING_SIZE * sizeof(char);
-    return x;
-}
-
-void deleteGetRequest(struct getRequest * x)
-{
-    if (x->body != NULL)
-        free(x->body);
-    x->bodySize = 0;
-}
-
-void print_getRequest(struct getRequest * x)
-{
-    printf("body: %s\n", x->body);
-    printf("body size: %ld\n", x->bodySize);
-}
-
 
 fileStruct initFileStruct(const char * FILE_NAME, const char * mode)
 {
@@ -148,6 +106,61 @@ fileStruct initFileStruct(const char * FILE_NAME, const char * mode)
     return fl;
 }
 
+struct getRequest initGetRequest()
+{
+    struct getRequest x;
+    x.body = (char *)calloc(STRING_SIZE, sizeof(char));
+    x.bodySize = STRING_SIZE * sizeof(char);
+    return x;
+}
+
+struct response initResponse()
+{
+    struct response res;
+    res.data = (char *)calloc(STRING_SIZE, sizeof(char));
+    res.size = STRING_SIZE * sizeof(char);
+    return res;
+}
+
+
+void print_getData(struct getData * gtD)
+{
+    printf("lon: %s\n", gtD->lon);
+    printf("lat: %s\n", gtD->lat);
+    printf("appid: %s\n", gtD->appid);
+    printf("units: %s\n", gtD->units);
+}
+
+void print_getRequest(struct getRequest * x)
+{
+    printf("body: %s\n", x->body);
+    printf("body size: %ld\n", x->bodySize);
+}
+
+void print_response(struct response * res)
+{
+    printf("data: %s\n", res->data);
+    printf("data size: %ld\n", res->size);
+}
+
+
+void deleteGetRequest(struct getRequest * x)
+{
+    if (x->body != NULL)
+        free(x->body);
+    x->bodySize = 0;
+}
+
+void deleteGetData(struct getData * gtD)
+{
+    if (gtD->appid != NULL)
+        free(gtD->appid);
+    if (gtD->units != NULL)
+        free(gtD->units);
+    gtD->lat = 0;
+    gtD->lon = 0;
+}
+
 void deleteFileStruct(const fileStruct * fl)
 {
     if (fl->fp != NULL) 
@@ -161,21 +174,6 @@ void deleteFileStruct(const fileStruct * fl)
     }
 }
 
-
-struct response initResponse()
-{
-    struct response res;
-    res.data = (char *)calloc(STRING_SIZE, sizeof(char));
-    res.size = STRING_SIZE * sizeof(char);
-    return res;
-}
-
-void print_response(struct response * res)
-{
-    printf("data: %s\n", res->data);
-    printf("data size: %ld\n", res->size);
-}
-
 void deleteResponse(struct response * res)
 {
     if (res->data != NULL)
@@ -183,6 +181,7 @@ void deleteResponse(struct response * res)
 
     res->size = 0;
 } 
+
 
 /* 
     get the data from API response to a string
