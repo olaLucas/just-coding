@@ -47,31 +47,45 @@ struct getRequest
     size_t bodySize;
 };
 
-struct client_credentials initClient();
-struct post initPOST();
-struct response initResponse();
-struct token initToken();
-struct getRequest initGetRequest();
+struct fileStruct
+{
+    FILE * fp;
+    char * fileName;
+    char * mode;
+};
 
-void print_credentials(struct client_credentials * clt);
-void print_token(struct token * tk);
-void print_post(struct post * pos);
-void print_response(struct response * res);
-void print_getRequest(struct getRequest * gt);
 
-void deleteClient(struct client_credentials * clt);
-void deletePOST(struct post * htp);
-void deleteResponse(struct response * res);
-void deleteToken(struct token * tk);
-void deleteGetRequest(struct getRequest * gt);
+typedef struct fileStruct fileStruct;
+typedef struct getRequest getRequest;
+typedef struct getData getData;
+typedef struct response responseStruct;
 
-size_t getResponse(void *data, size_t size, size_t nmeb, void *clientp);
-char * getDynamicJSONString(const char key[], const char * json_input);
-char * postToString(const char URL[], const char body[], const char headers[]);
-void postToFile(const char URL[], const char body[], const char headers[], const char FILE_NAME[]);
-char * getToString(const char URL[]);
-void getToFile(const char URL[], const char FILE_NAME[]);
-void getToJSON(const char URL[], const char FILE_NAME[]);
-void addKeyValueURL(struct getRequest * gt, const char key[], const char value[]);
-void addKeyValuePairToHTTPBody(struct post * pos, const char * key, const char * value);
-size_t file_size(FILE * arq);
+
+extern struct client_credentials initClient();
+extern struct post initPOST();
+extern struct response initResponse();
+extern struct token initToken();
+extern struct getRequest initGetRequest();
+
+extern void print_credentials(struct client_credentials * clt);
+extern void print_token(struct token * tk);
+extern void print_post(struct post * pos);
+extern void print_response(struct response * res);
+extern void print_getRequest(struct getRequest * gt);
+
+extern void deleteClient(struct client_credentials * clt);
+extern void deletePOST(struct post * htp);
+extern void deleteResponse(struct response * res);
+extern void deleteToken(struct token * tk);
+extern void deleteGetRequest(struct getRequest * gt);
+
+
+extern char * getDynamicJSONString(const char key[], const char * json_input);
+extern char * postToString(const char URL[], const char body[], const char headers[]);
+extern void postToFile(const char URL[], const char body[], const char headers[], const char FILE_NAME[]);
+extern void getToString(const char URL[], struct response * res);
+extern void getToFile(const char URL[], const fileStruct * fl);
+extern void getToJSONFile(const char URL[], const char FILE_NAME[]);
+extern char * makeURL(const char strArg[], ...);
+extern void GETRequest(const char URL[], void * output, const int flag);
+extern size_t file_size(FILE * arq);

@@ -6,12 +6,19 @@
     #include <string.h>
     #include <curl/curl.h>
     #include <cjson/cJSON.h>
+    #include <stdarg.h>
 
     #define STRING_SIZE 200
     #define BUFFER_SIZE 1024
     #define TOKEN_CHAR "\""
 
 #endif // INCLUDES
+
+
+const int FILE_FLAG = 0;
+const int JSON_FLAG = 1;
+const int STRING_FLAG = 2;
+
 
 struct postRequest
 {
@@ -32,7 +39,44 @@ struct getRequest
     char * body;
     size_t bodySize;
 };
+ 
+struct string
+{
+    char * str;
+    size_t length;
+    size_t max_size;
+};
 
+struct fileStruct
+{
+    FILE * fp;
+    char * fileName;
+    char * mode;
+};
+
+
+typedef struct fileStruct fileStruct;
+typedef struct getRequest getRequest;
+typedef struct getData getData;
+typedef struct string string;
+typedef struct response responseStruct;
+
+
+fileStruct initFileStruct(const char * FILE_NAME, const char * mode)
+{
+    fileStruct fl = {NULL, "", ""};
+    if ((fl.fp = fopen(FILE_NAME, mode)) == NULL)
+    {
+        fprintf(stderr, "Error while opening the file.");
+        exit(-1);
+    }
+
+    fl.fileName = (char *)calloc(strlen(FILE_NAME) + 1, sizeof(char));
+    memcpy(fl.fileName, FILE_NAME, strlen(FILE_NAME) + 1);
+
+    fl.mode = mode;
+    return fl;
+}
 
 struct response initResponse()
 {
@@ -40,6 +84,29 @@ struct response initResponse()
     res.data = (char *)calloc(STRING_SIZE, sizeof(char));
     res.size = STRING_SIZE * sizeof(char);
     return res;
+}
+
+string initSTRING(const size_t size)
+{
+    string buf;
+
+    if (size <= 0)
+    {
+        fprintf(stderr, "initBUFFER: size <= 0\n\n");
+        exit(-1);
+    }
+
+    buf.str = (char *)calloc(size, sizeof(char));
+    buf.length = 0;
+    buf.max_size = size;
+
+    if (buf.str == NULL)
+    {
+        fprintf(stderr, "initBUFFER: Out of memory!\n\n");
+        exit(-1);
+    }
+
+    return buf;
 }
 
 struct postRequest initPOST()
@@ -89,8 +156,30 @@ void deleteGetRequest(struct getRequest * x)
     x->bodySize = 0;
 }
 
+void deleteSTRING(string * buf)
+{
+    if (buf->str != NULL)
+        free(buf->str);
+    buf->max_size = 0;
+}
 
-// get the data from API response to string
+void deleteFileStruct(const fileStruct * fl)
+{
+    if (fl->fp != NULL) 
+    {
+        fclose(fl->fp);
+    } 
+
+    if (fl->fileName != NULL)
+    {
+        free(fl->fileName);
+    }
+}
+
+
+/* 
+    LibCurl callback functions
+*/
 size_t getResponseToString(void * data, size_t size, size_t nmeb, void * clientp)
 {
     struct response * res = (struct response *)clientp;
@@ -116,7 +205,6 @@ size_t getResponseToString(void * data, size_t size, size_t nmeb, void * clientp
     return realsize;
 }
 
-// get the data from API response to an file
 size_t getResponseToFile(void * data, size_t size, size_t nmeb, void * clientp)
 {
     size_t realsize = (size * nmeb);
@@ -137,7 +225,10 @@ size_t getResponseToFile(void * data, size_t size, size_t nmeb, void * clientp)
     return realsize;
 }
 
-// extract, format and dynamic allocate an string from an JSON file 
+
+/* 
+    extract, format and dynamic allocate an string from an JSON file 
+*/
 char * getDynamicJSONString(const char key[], const char * json_input)
 {
     cJSON * json;
@@ -170,7 +261,10 @@ char * getDynamicJSONString(const char key[], const char * json_input)
     }
 }
 
-// make an post request
+
+/* 
+    POST methods
+*/
 char * postToString(const char URL[], const char body[], const char headers[])
 {
     struct response res = initResponse();
@@ -196,22 +290,16 @@ char * postToString(const char URL[], const char body[], const char headers[])
     }
 }
 
-// make an get request
 
-
-void getToFile(const char URL[], const char FILE_NAME[])
+/* 
+    GET methods
+*/
+void getToFile(const char URL[], const fileStruct * fl)
 {
-    FILE * arq = fopen(FILE_NAME, "w");
-    if (arq == NULL)
-    {
-        fprintf(stderr, "Error while opening the file.");
-        return;
-    }
-
     CURL * handle = curl_easy_init();
     curl_easy_setopt(handle, CURLOPT_URL, URL);
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, getResponseToFile);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, arq);
+    curl_easy_setopt(handle, CURLOPT_WRITEDATA, fl->fp);
 
     CURLcode result = curl_easy_perform(handle);
     if (result != CURLE_OK)
@@ -220,20 +308,14 @@ void getToFile(const char URL[], const char FILE_NAME[])
         return;
     }
 
-    fclose(arq);
+    fflush(fl->fp);
     curl_easy_cleanup(handle);
 }
 
-void getToJSON(const char URL[], const char FILE_NAME[])
+void getToJSONFile(const char URL[], const fileStruct * fl)
 {
     cJSON * json;
     struct response res = initResponse();
-    FILE * arq = fopen(FILE_NAME, "w");
-    if (arq == NULL)
-    {
-        fprintf(stderr, "Error while opening the file.");
-        return;
-    }
 
     CURL * handle = curl_easy_init();
     curl_easy_setopt(handle, CURLOPT_URL, URL);
@@ -248,55 +330,241 @@ void getToJSON(const char URL[], const char FILE_NAME[])
     }
 
     json = cJSON_Parse(res.data);
-    fprintf(arq, cJSON_Print(json));
+    fprintf(fl->fp, cJSON_Print(json));
 
     deleteResponse(&res);
     cJSON_Delete(json);
     curl_easy_cleanup(handle);
-    fclose(arq);
+    fflush(fl->fp);
 }
 
-// add key value to an get URL
-void addKeyValueURL(struct getRequest * gt, const char key[], const char value[])
+void getToString(const char URL[], struct response * res)
 {
-    size_t newSize = (strlen(key) + strlen(value) + 1);
-    char buffer[newSize];
-    strcpy(buffer, "");
+    CURL * handle = curl_easy_init();
+    curl_easy_setopt(handle, CURLOPT_URL, URL);
+    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, getResponseToString);
+    curl_easy_setopt(handle, CURLOPT_WRITEDATA, res);
 
-    char * newDest = (char *)realloc(gt->body, (gt->bodySize + newSize));
-    if (newDest == NULL)
+    CURLcode result = curl_easy_perform(handle);
+    if (result != CURLE_OK)
     {
-        fprintf(stderr, "Out of memory!");
+        fprintf(stderr, "Error: %s\n", curl_easy_strerror(result));
         return;
     }
 
-    gt->bodySize += newSize;
-    gt->body = newDest;    
-    strcat(buffer, key);
-    strcat(buffer, value);
-    strcat(gt->body, buffer);
+    curl_easy_cleanup(handle);
 }
 
-void addKeyValuePairToHTTPBody(struct postRequest * pos, const char * key, const char * value)
-{
-    size_t newSize = (strlen(key) + strlen(value) + 1);
-    char buffer[newSize];
-    strcpy(buffer, "");
 
-    char * newDest = (char *)realloc(pos->body, (pos->body_size + newSize));
-    if (newDest == NULL)
+/* 
+    realloc the fstr->str to fit new amount of data
+*/
+char * resize(char * str, const size_t length)
+{
+    if (str != NULL && length > 0)
     {
-        fprintf(stderr, "Out of memory!");
-        return;
+        char * tempPtr = (char *)realloc(str, length);
+        if (tempPtr != NULL)
+            return tempPtr;
+        else
+        {
+            fprintf(stderr, "resize(): tempPtr == NULL");
+            exit(-1);
+        }
+
+    }
+    else if (str == NULL)
+    {
+        fprintf(stderr, "resize(): str == NULL");
+        return str;
+    }
+    else
+    {
+        fprintf(stderr, "resize(): length <= 0");
+        return str;
+    }
+}
+
+
+/* 
+    Copy an string (str) into the formated string (fstr->str) used in makeURL(). Also verify if it fits, if not, it call resize() to realloc fstr.str;
+*/
+void copystr(string * fstr, const char * str, const size_t str_length)
+{
+    if ((fstr->length + str_length) >= fstr->max_size)
+    {
+        fstr->str = resize(fstr->str, fstr->max_size + str_length + 1);
+        fstr->max_size += str_length;
     }
 
-    pos->body_size += newSize;
-    pos->body = newDest;
-    strcat(buffer, key);
-    strcat(buffer, value);
-    strcat(pos->body, buffer);
+    strcat(fstr->str, str);
+    fstr->length += str_length;
 }
 
+
+/* 
+    Like printf(), you pass the basic url with the type identifiers where it should be replaced by the respective variable passed to the function.
+*/
+char * makeURL(const char strArg[], ...)
+{
+    size_t ARG_Size = strlen(strArg);
+    string fstr = initSTRING(ARG_Size);
+    char * buffer = (char *)calloc(BUFFER_SIZE, sizeof(char));
+
+    if (buffer == NULL) {
+        fprintf(stderr, "makestr(): buffer == NULL");
+        exit(-1);
+    }
+
+    va_list list;
+    va_start(list, strArg);
+
+    char * ch;
+    int Findex = 0;
+    for (size_t i = 0; i < ARG_Size; i++)
+    {
+        ch = &strArg[i];
+        if (*ch != '%')
+        {
+            fstr.str[Findex] = *ch;
+            fstr.length++;
+            Findex++;
+            continue;
+        }
+
+        ch++; i++;
+        switch (*ch)
+        {
+        case 'd':
+            snprintf(buffer, BUFFER_SIZE, "%d", va_arg(list, int));
+            copystr(&fstr, buffer, strlen(buffer));
+            Findex = fstr.length; // updating the index
+            break;
+
+        case 'f':
+            snprintf(buffer, BUFFER_SIZE, "%f", va_arg(list, double));
+            copystr(&fstr, buffer, strlen(buffer));
+            Findex = fstr.length; // updating the index
+            break;
+
+        case 's':
+
+            char * tempStr = va_arg(list, char *);
+            if (strlen(tempStr) > 0)
+            {
+                copystr(&fstr, tempStr, strlen(tempStr));
+                Findex = fstr.length; // updating the index
+            }
+            break;
+
+        case 'c':
+            snprintf(buffer, BUFFER_SIZE, "%c", va_arg(list, int));
+            copystr(&fstr, buffer, strlen(buffer));
+            Findex = fstr.length; // updating the index
+            break;
+
+        case 'l':
+
+            switch (*(ch + 1))
+            {
+            case 'd':
+                snprintf(buffer, BUFFER_SIZE, "%ld", va_arg(list, long int));
+                copystr(&fstr, buffer, strlen(buffer));
+                Findex = fstr.length; // updating the index
+                break;
+
+            case 'f':
+                snprintf(buffer, BUFFER_SIZE, "%lf", va_arg(list, double));
+                copystr(&fstr, buffer, strlen(buffer));
+                Findex = fstr.length; // updating the index
+                break;
+
+            default:
+                fprintf(stderr, "makestr(): invalid indentifier: %c%c%c\n\n", *(ch - 2), *(ch - 1), *ch);
+                break;
+            }
+
+            ch++;
+            break;
+
+        default:
+            fprintf(stderr, "makestr(): invalid indentifier: %c%c\n\n", *(ch - 1), *ch);
+            break;
+        }
+
+        // cleaning buffer
+        strcpy(buffer, "");
+    }
+
+    free(buffer);
+    va_end(list);
+    return fstr.str;
+}
+
+
+/* 
+    wrapper of the GET methods. Pass the URL, the type of output (fileStruct )  and the flag (JSON, FILE, STRING) 
+*/
+void GETRequest(const char URL[], void * output, const int flag)
+{
+    if (FILE_FLAG == flag || JSON_FLAG == flag || STRING_FLAG == flag)
+    {
+        CURL * handle = curl_easy_init();
+        curl_easy_setopt(handle, CURLOPT_URL, URL);
+
+        if (FILE_FLAG == flag || JSON_FLAG == flag) // checking for files
+        {
+            fileStruct * fl = (fileStruct *)output;
+            if (fl->fp == NULL)
+            {
+                fprintf(stderr, "File was not initialized.\n\n");
+                if (fl->fileName != NULL)
+                {
+                    printf("Trying to open the file.\n\n");
+                    FILE * fileTemp = fopen(fl->fileName, fl->mode);
+                    if (fileTemp == NULL)
+                    {
+                        fprintf(stderr, "Was not possible to open the file.\n\n");
+                        exit(-1);
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "None file name was provided.\n\n");
+                    exit(-1);
+                }
+            }
+            else if (strcmp(fl->mode, "w") == 0 || strcmp(fl->mode, "a") == 0)
+            {
+                if (FILE_FLAG == flag) {
+                    getToFile(URL, fl);
+                }
+                else if (JSON_FLAG == flag) {
+                    getToJSONFile(URL, fl);
+                }               
+            }
+            else
+            {
+                fprintf(stderr, "Could not write in the file (might be opened in readmode)\n\n.");
+                fprintf(stderr, "fl->mode value: %s\n\n", fl->mode);
+                return;
+            }
+        }
+        else if (STRING_FLAG == flag) {
+            getToString(URL, (struct response *)output);
+        }
+    }
+    else // wrong flag
+    {
+        fprintf(stderr, "Invalid flag was passed to the function: %d \n\n", flag);
+        exit(-1);
+    }
+}
+
+
+/* 
+    get the size of an file
+*/
 size_t file_size(FILE * arq)
 {
     if (arq == NULL)
