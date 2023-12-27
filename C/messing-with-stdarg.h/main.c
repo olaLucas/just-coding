@@ -200,22 +200,8 @@ char * makestr(const char strArg[], ...)
 
 int main(void)
 {
-    char string[] = "https://api.openweathermap.org/data/2.5/weather?lat=-23.407428046314184&lon=-46.67494921823565&appid=d9bb8673ad981cda19119751b69abc35&units=metric";
-    char str[] = "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s";
-
-    char * url = makestr(
-        "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s %x",
-        "-23.407428046314184", "-46.67494921823565", "d9bb8673ad981cda19119751b69abc35"
-    );
-
-    // char * url = makestr(
-    //     "lat=%s&lon=%s&appid=%s",
-    //     "-23.407428046314184", "-46.67494921823565", "d9bb8673ad981cda19119751b69abc35"
-    // );
-
     char * test = makestr("abc %s %d %f", "Lucas", 20, 1.90f);
 
-    printf("url: %s\n\n", url);
     printf("test: %s\n\n", test);
 
     return 0;
