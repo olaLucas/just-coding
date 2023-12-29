@@ -12,13 +12,9 @@
 
 #endif // INCLUDES
 
-struct client_credentials
-{
-    char * content_type;
-    char * grant_type;
-    char * client_id;
-    char * client_secret;
-};
+extern const int FILE_FLAG;
+extern const int JSON_FLAG;
+extern const int STRING_FLAG;
 
 struct response
 {
@@ -55,37 +51,55 @@ struct fileStruct
 };
 
 
-typedef struct fileStruct fileStruct;
-typedef struct getRequest getRequest;
-typedef struct getData getData;
-typedef struct response responseStruct;
-
-
-extern struct client_credentials initClient();
-extern struct post initPOST();
+/*  
+    INIT Functions
+*/
+extern struct fileStruct initFileStruct(const char * FILE_NAME, const char * mode);
+extern struct postRequest initPOST();
 extern struct response initResponse();
-extern struct token initToken();
 extern struct getRequest initGetRequest();
 
-extern void print_credentials(struct client_credentials * clt);
-extern void print_token(struct token * tk);
-extern void print_post(struct post * pos);
+
+/* 
+    PRINT Functions
+*/
 extern void print_response(struct response * res);
 extern void print_getRequest(struct getRequest * gt);
 
-extern void deleteClient(struct client_credentials * clt);
-extern void deletePOST(struct post * htp);
+
+/*
+    DELETE Functions
+*/
+extern void deletePOST(struct postRequest * htp);
 extern void deleteResponse(struct response * res);
-extern void deleteToken(struct token * tk);
 extern void deleteGetRequest(struct getRequest * gt);
+extern void deleteFileStruct(const struct fileStruct * fl);
 
 
+/* 
+    extract, format and dynamic allocate an string from an JSON file 
+*/
 extern char * getDynamicJSONString(const char key[], const char * json_input);
+
+
+/* 
+    POST methods
+*/
 extern char * postToString(const char URL[], const char body[], const char headers[]);
-extern void postToFile(const char URL[], const char body[], const char headers[], const char FILE_NAME[]);
-extern void getToString(const char URL[], struct response * res);
-extern void getToFile(const char URL[], const fileStruct * fl);
-extern void getToJSONFile(const char URL[], const char FILE_NAME[]);
+
+
+/* 
+    Like printf(), you pass the basic url with the type identifiers where it should be replaced by the respective variable passed to the function.
+*/
 extern char * makeURL(const char strArg[], ...);
+
+/* 
+    wrapper of the GET methods. Pass the URL, the type of output ((void *)&fileStruct, (void *)&response) and the flag (JSON, FILE, STRING) 
+*/
 extern void GETRequest(const char URL[], void * output, const int flag);
+
+
+/* 
+    get the size of an file
+*/
 extern size_t file_size(FILE * arq);

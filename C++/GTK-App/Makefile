@@ -1,7 +1,7 @@
 TARGET = main
 CC = g++
-CFLAGS = -Wall
-LIBS != pkg-config --cflags	--libs gtkmm-4.0
+CFLAGS = -Wall -g -static
+LIBS != pkg-config gtkmm-4.0 --static --libs --cflags
 
 $(TARGET) : main.cpp
-	$(CC) main.cpp -o $(TARGET) $(cflags) $(LIBS)
+	$(CC) main.cpp -o $(TARGET) $(CFLAGS) $(LIBS)
