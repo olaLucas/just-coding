@@ -201,7 +201,6 @@ char * makestr(const char strArg[], ...)
 int main(void)
 {
     char * test = makestr("abc %s %d %f", "Lucas", 20, 1.90f);
-
     printf("test: %s\n\n", test);
 
     return 0;
