@@ -1,16 +1,21 @@
-#if !defined(INCLUDES)
-#define INCLUDES
-
+#if !defined(STD_INCLUDES)
+    #define STD_INCLUDES
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
-    #include <curl/curl.h>
+
+    #define STRING_SIZE 300
+    #define BUFFER_SIZE 1024
+    #define TOKEN_CHAR "\""
+
+#endif // STD_INCLUDES
+
+#if !defined(CJSON_INCLUDE)
+#define CJSON_INCLUDE
+
     #include <cjson/cJSON.h>
 
-    #define STRING_SIZE 200
-    #define BUFFER_SIZE 1024
-
-#endif // INCLUDES
+#endif // CJSON_INCLUDE
 
 extern const int FILE_FLAG;
 extern const int JSON_FLAG;
@@ -30,11 +35,11 @@ struct postRequest
     char * body;
 };
 
-struct token
+struct string
 {
-    char * access_token;
-    char * token_type;
-    size_t expires_in;
+    char * str;
+    size_t length;
+    size_t max_size;
 };
 
 struct getRequest
@@ -57,6 +62,7 @@ struct fileStruct
 extern struct fileStruct initFileStruct(const char * FILE_NAME, const char * mode);
 extern struct postRequest initPOST();
 extern struct response initResponse();
+extern struct string initSTRING(const size_t size);
 extern struct getRequest initGetRequest();
 
 
@@ -73,13 +79,8 @@ extern void print_getRequest(struct getRequest * gt);
 extern void deletePOST(struct postRequest * htp);
 extern void deleteResponse(struct response * res);
 extern void deleteGetRequest(struct getRequest * gt);
+extern void deleteSTRING(struct string * buf);
 extern void deleteFileStruct(const struct fileStruct * fl);
-
-
-/* 
-    extract, format and dynamic allocate an string from an JSON file 
-*/
-extern char * getDynamicJSONString(const char key[], const char * json_input);
 
 
 /* 
@@ -98,6 +99,11 @@ extern char * makeURL(const char strArg[], ...);
 */
 extern void GETRequest(const char URL[], void * output, const int flag);
 
+/* 
+    str functions
+*/
+
+extern void strcln(char str[]);
 
 /* 
     get the size of an file
