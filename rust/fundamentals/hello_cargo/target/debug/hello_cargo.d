@@ -1,0 +1,1 @@
+/run/host/media/dio/code/git\ repositories/just-coding/rust/fundamentals/hello_cargo/target/debug/hello_cargo: /run/host/media/dio/code/git\ repositories/just-coding/rust/fundamentals/hello_cargo/src/main.rs

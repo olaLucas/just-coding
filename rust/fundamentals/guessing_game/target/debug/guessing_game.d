@@ -1,0 +1,1 @@
+/run/host/media/dio/code/git\ repositories/just-coding/rust/fundamentals/guessing_game/target/debug/guessing_game: /run/host/media/dio/code/git\ repositories/just-coding/rust/fundamentals/guessing_game/src/main.rs

@@ -1,0 +1,1 @@
+/run/host/media/dio/code/git\ repositories/just-coding/rust/fundamentals/mem_allocation/target/debug/mem_allocation: /run/host/media/dio/code/git\ repositories/just-coding/rust/fundamentals/mem_allocation/src/main.rs
