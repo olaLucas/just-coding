@@ -432,17 +432,17 @@ void checkTerminalArgs(struct APIData_t * data, int argc, char * argv[])
     {
         if (strcmp(argv[i], "--appid") == 0 || strcmp(argv[i], "-a") == 0)
         {
-            data->appid = argv[i + 1];
+            strcpy(data->appid, argv[i + 1]);
             i++;
         }
         else if (strcmp(argv[i], "--city") == 0 || strcmp(argv[i], "-c") == 0)
         {
-            data->geo.city = argv[i + 1];
+            strcpy(data->geo.city, argv[i + 1]);
             i++;
         }
         else if (strcmp(argv[i], "--country") == 0 || strcmp(argv[i], "-C") == 0)
         {
-            data->geo.country = argv[i + 1];
+            strcpy(data->geo.country, argv[i + 1]);
             i++;
         }
     }
@@ -507,6 +507,7 @@ int main(int argc, char * argv[])
     }
     else
     {   
+        data = initData();
         checkTerminalArgs(&data, argc, argv);
         struct string resGeocoding = GETGeocoding(data);
 

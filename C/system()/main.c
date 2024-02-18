@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    printf("Directory: %s", )
+    printf("Directory: %s", );
 
     system("ls");
     return 0;
