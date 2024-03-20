@@ -1,4 +1,1 @@
-def main():
-    print("Hello, world!")
-
-main()
+print("Jorge Artur Aparecido de Souza")
