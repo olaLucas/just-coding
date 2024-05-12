@@ -1,0 +1,58 @@
+from html.parser import HTMLParser
+from urllib.request import urlopen
+from urllib.parse import urljoin
+
+class parser(HTMLParser):
+
+    def seturl(self, url):
+        self.url = url
+    
+    def geturl(self):
+        return self.url
+
+    def setcontent(self, content):
+        self.content = content
+
+    def getcontent(self):
+        return self.content
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            for attr in attrs:
+                if attr[0] == 'href':
+                    if attr[1].find('http') >= 0:
+                        print(attr[1])
+                    else:
+                        print(urljoin(self.url, attr[1]))    
+        
+#    def handle_endtag(self, tag):
+#        print(tag)
+
+    def parsehtml(self, url = '', content = ''):
+        if url == '':
+            if self.url != '':
+                url = self.geturl()
+            else:
+                print('url is empty')
+                return false
+
+        if content == '':
+            if self.content == '':
+                self.getsource()            
+            content = self.getcontent()
+
+        self.feed(content)
+
+    def getsource(self, url = ''):
+        if url == '':
+            if self.url != '':
+                url = self.url
+            else:
+                print('url is empty')
+                return false
+
+        content = urlopen(url)
+        self.content = content.read().decode()
+
+par = parser()
+par.parsehtml('https://www.w3.org/mission/')
