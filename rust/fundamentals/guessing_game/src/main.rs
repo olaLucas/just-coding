@@ -2,8 +2,7 @@ use std::io;
 use rand::Rng;
 use std::cmp::Ordering;
 
-fn main()
-{
+fn main() {
     println!("Advinhe o número!");
     let num = rand::thread_rng().gen_range(1..=100);
     
@@ -20,8 +19,7 @@ fn main()
             Err(_) => continue,
         };
 
-        match chute.cmp(&num) 
-        {
+        match chute.cmp(&num) {
             Ordering::Less => println!("Muito pequeno..."),
             Ordering::Greater => println!("Muito grande..."),
             Ordering::Equal => {

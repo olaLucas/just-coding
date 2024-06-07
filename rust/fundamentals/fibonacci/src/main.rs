@@ -6,7 +6,7 @@ fn main() {
     let mut y: u32 = 0;
 
     let mut rep = String::new();
-    
+
     println!("Insira a quantidade de repetições: ");
     io::stdin()
         .read_line(&mut rep)
@@ -25,8 +25,8 @@ fn main() {
         }
 
         println!("valor final: {y}");
-    } 
-    else 
+    }
+    else
     {
         println!("Finalizando programa...");
     }
