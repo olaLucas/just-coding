@@ -40,10 +40,10 @@ Arg args_arr[] = {
 const int ARG_ARR_SIZE = sizeof(args_arr) / sizeof(Arg);
 
 
-int 
+int
 read_term_arg(int argv, char * argc[], void ** return_arg) {
 	for (int i = 1; i < argv; i++) {
-		for (int j = 0; i < ARG_ARR_SIZE; j++) {
+		for (int j = 0; j < ARG_ARR_SIZE; j++) {
 				if (!strcmp(argc[i], args_arr[j].short_name) || !strcmp(argc[i], args_arr[j].long_name)) {
 					if (args_arr[j].return_value == true) {
 					*return_arg = argc[i + 1];
@@ -58,8 +58,22 @@ read_term_arg(int argv, char * argc[], void ** return_arg) {
 }
 
 void
-invalid_term_arg( int argv,  char * argc[]) {
-	// TODO
+invalid_term_arg(int argv, char * argc[]) {
+	int j = 0;
+	for (int i = 1; i < argv; i++) {
+		while (true) {
+			if (j == ARG_ARR_SIZE	) {
+				fprintf(stderr, "invalid argument: %s\n", argc[i]);
+				break;
+			} else if (!strcmp(argc[i], args_arr[j].short_name) || !strcmp(argc[i], args_arr[j].long_name)) {
+				break;
+			} else {
+				j++;
+			}
+		}
+
+		j = 0;
+	}
 }
 
 int
@@ -79,7 +93,7 @@ read_file(const char * PATH) {
 int
 write_file(const char * PATH, const int new_value) {
 	FILE * sys_file = fopen(PATH, "w+"); // do not create the file
-	if (!sys_file) {	
+	if (!sys_file) {
 		 fprintf(stderr, "error while opening %s file in read mode.\n", PATH);
 		 return 0;
 	} else {
@@ -91,7 +105,7 @@ write_file(const char * PATH, const int new_value) {
 
 int
 main(int argv, char * argc[]) {
-	
+
 	void * arg = NULL;
 	switch (read_term_arg(argv, argc, &arg)) {
 		case INFO:
@@ -106,7 +120,7 @@ main(int argv, char * argc[]) {
 		default:
 			invalid_term_arg(argv, argc);
 			break;
-	}		
+	}
 
 	return 0;
-}	
+}
