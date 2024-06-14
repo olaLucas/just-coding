@@ -1,45 +1,15 @@
-struct Geocoding {
-	city: String,
-	country: String,
-	state: String,
-	lat: f32,
-	lon: f32
-}
+use std::fs::File;
 
-struct User {
-	appid: String,
-	units: String,
-}
+fn open_file(_path: &str) -> File {
+  let file = File::open(_path);
+  let file = match file {
+    Ok(file) => file,
+    Err(error) => panic!("Error ({error}) while trying to open {_path} file."), 
+  };
 
-// defining methods
-impl Geocoding {
-
-}
-
-// defining methods
-impl User {
-
-}
-
-fn build_geocoding(city: String, country: String, state: String, lat: f32, lon: f32) -> Geocoding {
-	Geocoding {
-		city,
-		country,
-		state,
-		lat,
-		lon, 
-	}
-}
-
-fn build_user(appid: String, units: String) -> User {
-	User {
-		appid,
-		units
-	}
+  return file;
 }
 
 fn main() {
-
-	let x = Some("Lucas");
-	println!("{:?}", x);
+    println!("{:?}", open_file("foo.rs"));
 }

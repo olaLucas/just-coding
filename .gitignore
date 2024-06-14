@@ -1,3 +1,2 @@
-
-/py/faculdade/COM120/gui/env
-py/faculdade/COM120/gui/__pycache__/calendar.cpython-312.pyc
+target/
+env/
