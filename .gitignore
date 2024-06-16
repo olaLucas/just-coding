@@ -1,2 +1,2 @@
-target/
-env/
+rust/*/target/
+py/*/env/
