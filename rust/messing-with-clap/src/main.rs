@@ -21,23 +21,21 @@ fn add(vec_numbers: &Vec<i32>) -> i32 {
 fn parse_terminal_args(arguments: &[Arg]) -> ArgMatches {
 
   let matches = Command::new("TESTING CLAP")
-  .author("me, myself and I")
-  .about("testing how to handle cli args with clap")
-  .args(arguments)
-  .get_matches();
+    .author("me, myself and I")
+    .about("testing how to handle cli args with clap")
+    .args(arguments)
+    .get_matches();
 
-
-  println!("{:#?}", matches);
   return matches;
 }
 
 
 fn main() {
   let arguments: &[Arg; 2] = &[
-    arg!(sum: -a --sum [NUMBERS] "sum two numbers")
+    arg!(sum: -a --sum <NUMBERS> "sum two numbers")
       .value_parser(value_parser!(i32))
       .num_args(1..),
-    arg!(sub: -s --sub [NUMBERS] "subtract two numbers")
+    arg!(sub: -s --sub <NUMBERS> "subtract two numbers")
       .value_parser(value_parser!(i32))
       .num_args(1..),
   ];
