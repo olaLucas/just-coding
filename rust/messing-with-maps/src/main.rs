@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::io;
+use serde_json;
 
 fn scan_dir_filename(path: &Path) -> Result <Option <Vec<String>>, io::Error> {
   let mut vec: Vec <String> = Vec::new();
@@ -67,10 +68,20 @@ fn craw_dir(path: &Path) -> Result< Option <HashMap <String, Vec<String>>>, walk
   Ok(Some(map))
 }
 
+fn write_file(file_path: &Path, map: &HashMap<String, Vec<String>>) -> Result<(), serde_json::Error> {
+
+  let content = serde_json::to_string_pretty(&map).unwrap();
+  fs::write(file_path, content.as_bytes())
+    .expect("Error while trying to write content to output file.");
+
+  Ok(())
+}
+
+
 fn main() {
   let arg = env::args().last().unwrap();
   match craw_dir(Path::new(&arg)) {
-    Ok(Some(map)) => println!("{map:#?}"),
+    Ok(Some(map)) => write_file(Path::new("output.json"), &map).unwrap(),
     Ok(None) => println!("craw_dir returned None."),
     Err(e) => eprintln!("vish, deu erro: {e:#?}"),
   }
