@@ -1,0 +1,71 @@
+use std::io::Error;
+use std::fs;
+use std::fs::File;
+use std::io::ErrorKind;
+use std::io::Result;
+use std::io::Write;
+use std::path::Path;
+use clap::arg;
+use clap::value_parser;
+use clap::Arg;
+use clap::Command;
+
+fn parse_terminal_args(arguments: &[Arg]) -> clap::ArgMatches {
+    return Command::new("chbacklight")
+        .args(arguments)
+        .about("Changes the brightness notebooks displays")
+        .author("dio")
+        .get_matches();
+}
+
+fn read_file(path: &Path) {
+    if !path.exists() {
+        eprintln!(
+            "ERROR: NotFound\n{} dont exists.", 
+            path.to_str().expect("failed to convert path to string")
+        )
+    } 
+   
+    match fs::read_to_string(path) {
+        Ok(s) => println!("brightness value: {}", s),
+        Err(e) => eprintln!(
+            "ERROR:{}\nfailed to read the content of {}.", 
+            e, path.to_str().expect("failed to convert path to string")
+        ),
+    }
+}
+
+fn write_file(path: &Path, new_value: u8) -> Result<(), Error> {
+    
+    if !path.exists() {
+        eprintln!("ERROR: {} does not exists.", path.to_str().expect("write_file: failed to conver Path to string."));
+        return Err(Error::from(ErrorKind::NotFound));
+    }
+
+    let mut file = File::create(path)?;
+    file.write_all(content);
+
+    Ok(())
+}
+
+fn main() {
+   
+    let sys_path = Path::new("/sys/class/backlight/amdgpu_bl1/brightness");
+    let arguments: &[Arg] = &[
+        arg!(set: -s --set <VALUE> "change the brightness to <VALUE>.")
+            .value_parser(value_parser!(u8))
+            .num_args(1),
+        arg!(info: -i --info "return the brightness value.")
+            .action(clap::ArgAction::SetTrue),
+    ];
+
+    let matches = parse_terminal_args(arguments);
+    if let Some(arg) = matches.get_one::<u8>("set") {
+        let new_value = arg;
+        println!("new_value = {new_value}");
+    }
+
+    if matches.get_flag("info") {
+        read_sys_file(sys_path)
+    }
+} 

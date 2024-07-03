@@ -97,7 +97,7 @@ write_file(const char * PATH, const int new_value) {
 		 fprintf(stderr, "error while opening %s file in read mode.\n", PATH);
 		 return 0;
 	} else {
-		fprintf(sys_file, "%d", new_value);
+		fprintf(stdout, "%d", new_value);
 		fclose(sys_file);
 		return new_value;
 	}
