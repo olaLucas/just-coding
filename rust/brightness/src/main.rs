@@ -1,6 +1,6 @@
 use std::fs;
-use std::io::{ ErrorKind, Write, Result, Error };
 use std::path::Path;
+use std::io::{ ErrorKind, Write, Result, Error };
 use clap::{ arg, value_parser, Arg, Command };
 
 fn parse_terminal_args(arguments: &[Arg]) -> clap::ArgMatches {
@@ -31,7 +31,10 @@ fn read_file(path: &Path) {
 fn write_file(path: &Path, new_value: u8) -> Result<()> {
     
     if !path.exists() {
-        eprintln!("ERROR: {} does not exists.", path.to_str().expect("write_file: failed to conver Path to string."));
+        eprintln!("ERROR: {} does not exists.", 
+            path.to_str().expect("write_file: failed to conver Path to string.")
+        );
+
         return Err(Error::from(ErrorKind::NotFound));
     }
 
@@ -41,7 +44,9 @@ fn write_file(path: &Path, new_value: u8) -> Result<()> {
         .create(true)
         .open(path)?;
 
-    let new_value: [u8; 1] = [new_value];
+    let new_value = new_value
+        .to_string()
+        .into_bytes();
     file.write_all(&new_value)?;
 
     Ok(())
