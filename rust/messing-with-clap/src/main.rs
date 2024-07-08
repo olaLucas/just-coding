@@ -1,4 +1,4 @@
-use clap::*;
+use clap::{Arg, ArgMatches, Command, arg, value_parser};
 
 fn sub(vec_numbers: &Vec<i32>) -> i32 {
   let mut result: i32 = 0;
@@ -6,7 +6,7 @@ fn sub(vec_numbers: &Vec<i32>) -> i32 {
     result += i;
   }
 
-  return result;
+  result
 }
 
 fn add(vec_numbers: &Vec<i32>) -> i32 {
@@ -14,24 +14,22 @@ fn add(vec_numbers: &Vec<i32>) -> i32 {
   for i in vec_numbers {
     result += i;
   }
-
-  return result;
+  
+  result
 }
 
 fn parse_terminal_args(arguments: &[Arg]) -> ArgMatches {
 
-  let matches = Command::new("TESTING CLAP")
+  Command::new("TESTING CLAP")
     .author("me, myself and I")
     .about("testing how to handle cli args with clap")
     .args(arguments)
-    .get_matches();
-
-  return matches;
+    .get_matches()
 }
 
 
 fn main() {
-  let arguments: &[Arg; 2] = &[
+  let arguments = &[
     arg!(sum: -a --sum <NUMBERS> "sum two numbers")
       .value_parser(value_parser!(i32))
       .num_args(1..),
