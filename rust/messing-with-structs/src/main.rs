@@ -1,5 +1,5 @@
-pub mod data_structure;
-use data_structure::{person::Person, stack::Stack};
+pub mod structs;
+use structs::{person::Person, stack::Stack};
 
 fn main() {
 
