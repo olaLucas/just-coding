@@ -41,11 +41,30 @@ pub mod geocoding {
     }
 }
 
-pub mod api {
-    pub struct data {
-        appid:  String,
-        units:  String,
-    } 
+pub mod request {
+
+    #[derive(Debug)]
+    pub struct Data {
+        appid:      String,
+        city:       String,
+        country:    String,
+        units:      String,
+    }
+
+    impl Data {
+        pub fn new(city: String, country: String, appid: String, units: String) -> Data{
+            Data {
+                appid,
+                city,
+                country,
+                units,
+            }
+        }
+    }
+
+    pub fn get_geocoding(data: Data) {
+         
+    }
 }
 
 pub mod weather {

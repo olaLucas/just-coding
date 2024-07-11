@@ -2,14 +2,10 @@ pub mod api;
 pub mod cli;
 pub mod cache;
 
-
-use api::{
-    api::data,
-    weather::Weather,
-    geocoding::Geocoding,
-};
-
+use api::request::Data;
+use 
 
 fn main() {
-    println!("Hello, world!");
+    let (appid, city, country, units) = cli::matches();
+    let d = Data::new(appid, city, country, units);    
 }
