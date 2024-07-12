@@ -7,5 +7,5 @@ use
 
 fn main() {
     let (appid, city, country, units) = cli::matches();
-    let d = Data::new(appid, city, country, units);    
+        
 }
