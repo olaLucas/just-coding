@@ -4,7 +4,8 @@ use clap::value_parser;
 use clap::Command;
 use clap::Arg;
 
-pub fn matches() -> (String, String, String, String) {
+pub fn matches() -> Box<HashMap<String, String>> {
+
     let arguments: &[Arg] = &[
         arg!(appid: -a --appid <STRING> "Openweather API Key")
             .num_args(1)
@@ -31,23 +32,25 @@ pub fn matches() -> (String, String, String, String) {
                         .author("Dio")
                         .args(arguments)
                         .get_matches();
-
-    let appid = matches.get_one::<String>("appid")
-        .unwrap()
-        .to_string();
     
-    let city = matches.get_one::<String>("city")
-        .unwrap()
-        .to_string();
-    
-    let country = matches.get_one::<String>("country")
-        .unwrap()
-        .to_string();
 
-    let units = match matches.get_one::<String>("units") {
-        Some(u) => u.to_string(),
-        None => "metric".to_string(), // sets metric as default
-    };
+    let mut hash: Box<HashMap<String, String>> = Box::new(HashMap::new());
 
-    return (appid, city, country, units);
+    let args_array = [
+        "appid",
+        "city",
+        "country",
+        "units",
+    ];
+
+    for item in args_array.iter() {
+        hash.insert(
+            item.to_string(), 
+            matches.get_one::<String>(item)
+                .unwrap()
+                .to_string()
+        );
+    }
+
+    return hash;
 } 
