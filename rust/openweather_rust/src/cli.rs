@@ -46,9 +46,10 @@ pub fn matches() -> Box<HashMap<String, String>> {
     for item in args_array.iter() {
         hash.insert(
             item.to_string(), 
-            matches.get_one::<String>(item)
-                .unwrap()
-                .to_string()
+            match matches.get_one::<String>(item) {
+                Some(s) => s.to_string(),
+                None => String::from("metric"),
+            }
         );
     }
 
