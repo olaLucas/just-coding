@@ -48,7 +48,7 @@ pub fn matches() -> Box<HashMap<String, String>> {
             item.to_string(), 
             match matches.get_one::<String>(item) {
                 Some(s) => s.to_string(),
-                None => String::from("metric"),
+                None => String::new(),
             }
         );
     }

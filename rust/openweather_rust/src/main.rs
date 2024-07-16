@@ -7,6 +7,7 @@ pub mod http;
 pub mod cli;
 pub mod cache;
 
+#[derive(Debug)]
 struct APIData {
     appid: String,
     city: String,
@@ -24,8 +25,41 @@ impl APIData {
         }
     }
 
-    pub fn parse_json(json: serde_json::Value) -> APIData {
+    pub fn parser_json(json: serde_json::Value) -> APIData {
+        let appid: String = match json.get("appid") {
+            Some(s) => s.to_string(),
+            None => panic!("ERROR APIData::parse_json -> appid not found in json"),
+        };    
         
+        let city: String = match json.get("city") {
+            Some(s) => s.to_string(),
+            None => {
+                match json.get("name") { // when reading from cache, name key holds the city
+                    Some(s) => s.to_string(),
+                    None => panic!("ERROR APIData::parse_json -> city not found in json")
+                }
+            },
+        };
+
+        let country: String = match json.get("country") {
+            Some(s) => s.to_string(),
+            None => panic!("ERROR APIData::parse_json -> country not found in json"),
+        };
+
+        let units: String = match json.get("units") {
+            Some(s) => {
+                if s != "metric" || s != "imperial" {
+                    eprintln!("Invalid measurement units system: {s}");
+                    panic!("Error APIData::parse_json -> invalid measurement units system.");
+                } else {
+                    s.to_string()
+                }
+            },
+
+            None => String::from("metric"),
+        };
+        
+        APIData::new(appid, city, country, units)
     }
 }
 
@@ -73,22 +107,25 @@ fn main() {
             },
         };
 
+        let cache = APIData::parser_json(cache);
+        println!("{:#?}", cache);
+
         // reminder: the geocoding data comes inside an array
         
-        let geo = &cache.get("geocoding")
-            .unwrap_or_else(|| panic!("geocoding not found in cache."));
-        let geo = &geo[0];
-
-        let weather_url: String = format!(
-            "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
-            geo.get("lat").expect("lat not found."),
-            geo.get("lon").expect("lon not found."),
-            cache.get("appid")
-                .expect("appid not found")
-                .as_str().expect("failed to convert appid to string")
-        );
+        //let geo = &cache.get("geocoding")
+        //    .unwrap_or_else(|| panic!("geocoding not found in cache."));
+        //let geo = &geo[0];
+        //
+        //let weather_url: String = format!(
+        //    "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
+        //    geo.get("lat").expect("lat not found."),
+        //    geo.get("lon").expect("lon not found."),
+        //    cache.get("appid")
+        //        .expect("appid not found")
+        //        .as_str().expect("failed to convert appid to string")
+        //);
         
-        println!("{:#?}", http::get(&weather_url));
+        //println!("{:#?}", http::get(&weather_url));
 
     } else {
         panic!("none arguments were provided and neither cache to use.");
