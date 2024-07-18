@@ -10,9 +10,9 @@ pub struct Weather {
     sunrise: String,
         
     // max, curr, min
-    temp: (f32, f32, f32),
-    feels_like: f32,
-    humidity: f32,
+    temp: (f64, f64, f64),
+    feels_like: f64,
+    humidity: u64,
 }
 
 impl Weather {
@@ -23,9 +23,9 @@ impl Weather {
         sunrise: String,
             
         // max, curr, min
-        temp: (f32, f32, f32), 
-        feels_like: f32,
-        humidity: f32,
+        temp: (f64, f64, f64), 
+        feels_like: f64,
+        humidity: u64,
     ) -> Weather {
         Weather {
             date,
@@ -130,7 +130,7 @@ impl Weather {
         };
                 // min, curr, max 
         let temp: (f64, f64, f64) = {
-            let min: f32 = match main.get("temp_min") {
+            let min: f64 = match main.get("temp_min") {
                 Some(s) => s.as_f64()
                     .expect("ERROR Weather::parse_json > failed to convert min temp value to f64."),
                 None => {
@@ -179,7 +179,8 @@ impl Weather {
         };
 
         Weather::new(
-            dt, 
+            dt,
+            weather,
             sunset, 
             sunrise, 
             temp, 
@@ -187,7 +188,4 @@ impl Weather {
             humidity
         )
     }
-
-
-
 }

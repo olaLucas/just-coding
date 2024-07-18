@@ -72,14 +72,13 @@ fn get_weather() {
 }
 
 fn main() {
-      
+    let home_json_path: &Path = Path::new("/home/dio/.config/weather/config.json");
     
     if args().len() > 1 {
         let data: APIData = get_geocoding(cli::matches());
         println!("{:#?}", data);
 
     } else if home_json_path.exists() {
-        
 
     } else {
         panic!("none arguments were provided and neither cache to use.");
