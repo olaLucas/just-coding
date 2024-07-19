@@ -4,6 +4,8 @@ use std::env::args;
 use std::path::Path;
 use std::process::exit;
 use apidata::APIData;
+use serde_json::Map;
+use serde_json::Value;
 
 pub mod http;
 pub mod cli;
@@ -34,23 +36,28 @@ fn get_geocoding(h: Box<HashMap<String, String>>) -> APIData {
             exit(-1);
         }
     };
+    
+    
 
+    println!("{:#?}", geo);
     return APIData::parser_json(&geo[0]);
 }
 
 fn get_weather() {
 
     let home_json_path: &Path = Path::new("/home/dio/.config/weather/config.json");
-    let cache: serde_json::Value = match cache::read_cache(home_json_path) {
+    let cache: Value = match cache::read_cache(home_json_path) {
         Ok(s) => serde_json::from_str(&s)
-            .unwrap_or_else(|_| panic!("failed to convert from string to json.")),
+            .expect("failed to convert from string to json."),
         Err(e) => {
             eprintln!("error: {:#?}", e);
             panic!("failed to read cache. aborting...");
         },
     };
 
-    let cache = APIData::parser_json(&cache);
+    let mut cache = cache.as_object_mut().unwrap();
+
+    let cache = APIData::parser_json(, &cache);
     println!("{:#?}", cache);
 
     // reminder: the geocoding data comes inside an array
