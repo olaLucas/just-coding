@@ -4,7 +4,6 @@ use std::env::args;
 use std::path::Path;
 use std::process::exit;
 use apidata::APIData;
-use serde_json::Map;
 use serde_json::Value;
 
 pub mod http;
@@ -36,11 +35,8 @@ fn get_geocoding(h: Box<HashMap<String, String>>) -> APIData {
             exit(-1);
         }
     };
-    
-    
 
     println!("{:#?}", geo);
-    return APIData::parser_json(&geo[0]);
 }
 
 fn get_weather() {
@@ -55,9 +51,6 @@ fn get_weather() {
         },
     };
 
-    let mut cache = cache.as_object_mut().unwrap();
-
-    let cache = APIData::parser_json(, &cache);
     println!("{:#?}", cache);
 
     // reminder: the geocoding data comes inside an array
