@@ -16,25 +16,10 @@ pub struct Weather {
 }
 
 impl Weather {
-    pub fn new(
-        date: String,
-        weather: (String, String),
-        sunset: String, 
-        sunrise: String,
-            
-        // max, curr, min
-        temp: (f32, f32, f32),
-        feels_like: f32,
-        humidity: u8,
-    ) -> Weather {
+    pub fn new(date: String, weather: (String, String), sunset: String, sunrise: String, temp: (f32, f32, f32), feels_like: f32, humidity: u8) -> Weather {
         Weather {
-            date,
-            weather,
-            sunset, 
-            sunrise,
-
-            temp, 
-            feels_like,
+            date, weather, sunset, 
+            sunrise, temp, feels_like,
             humidity,
         }
     }
