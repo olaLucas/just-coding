@@ -20,4 +20,19 @@ impl APIData {
             units,
         }
     }
+    pub fn get_appid(&self) -> &str {
+        &self.appid
+    }
+
+    pub fn get_city(&self) -> &str {
+        &self.city
+    }
+
+    pub fn get_country(&self) -> &str {
+        &self.country
+    }
+
+    pub fn get_units(&self) -> &str {
+        &self.units
+    }
 }

@@ -1,10 +1,11 @@
-use std::collections::HashMap;
 use clap::arg;
 use clap::value_parser;
 use clap::Command;
 use clap::Arg;
+use crate::apidata::APIData;
+use std::process::exit;
 
-pub fn matches() -> Box<HashMap<String, String>> {
+pub fn matches() -> APIData {
 
     let arguments: &[Arg] = &[
         arg!(appid: -a --appid <STRING> "Openweather API Key")
@@ -33,25 +34,40 @@ pub fn matches() -> Box<HashMap<String, String>> {
                         .args(arguments)
                         .get_matches();
     
+    let appid: String = match matches.get_one::<String>("appid") {
+        Some(s) => s.to_string(),
+        None => {
+            eprintln!("ERROR cli::matches > appid not found.");
+            exit(-1);
+        }
+    };
 
-    let mut hash: Box<HashMap<String, String>> = Box::new(HashMap::new());
+    let city: String = match matches.get_one::<String>("city") {
+        Some(s) => s.to_string(),
+        None => {
+            eprintln!("ERROR cli::matches > city not found.");
+            exit(-1);
+        }
+    };
 
-    let args_array = [
-        "appid",
-        "city",
-        "country",
-        "units",
-    ];
+    let country: String = match matches.get_one::<String>("country") {
+        Some(s) => s.to_string(),
+        None => {
+            eprintln!("ERROR cli::matches > country not found.");
+            exit(-1);
+        }
+    };
 
-    for item in args_array.iter() {
-        hash.insert(
-            item.to_string(), 
-            match matches.get_one::<String>(item) {
-                Some(s) => s.to_string(),
-                None => String::new(),
-            }
-        );
-    }
+    let units: String = match matches.get_one::<String>("units") {
+        Some(s) => s.to_string(),
+        None => "metric".to_string() 
+    };
 
-    return hash;
+    APIData::new(
+        appid,
+        city,
+        String::new(),
+        country,
+        units,
+    )
 } 

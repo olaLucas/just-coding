@@ -9,6 +9,7 @@ pub fn read_cache(path: &Path) -> Result<String, io::Error> {
     }
     
     let content: String = fs::read_to_string(path)?;
+    
 
     Ok(content)
 }

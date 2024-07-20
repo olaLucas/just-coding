@@ -12,31 +12,29 @@ pub mod cache;
 pub mod apidata;
 pub mod weather;
 
-fn get_geocoding(h: Box<HashMap<String, String>>) -> APIData {
-
-    if h.is_empty() {
-        eprintln!("ERROR at get_geocoding > HashMap is empty.");
-        exit(-1);
-    }
-
-    let city = h.get("city").expect("main > city not found.");
-    let country = h.get("country").expect("main > country not found.");
-    let appid = h.get("appid").expect("main > appid not found.");
+fn get_geocoding(h: APIData) -> APIData {
 
     let url = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={},{}&appid={}",
-       city, country, appid 
+       h.get_city(), h.get_country(), h.get_appid() 
     );
     
-    let geo: serde_json::Value = match http::get(&url) {
-        Ok(g) => g,
+    let r: APIData match http::get(&url) {
+        Ok(s) => match serde_json::from_str(&s) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("ERROR main::get_geocoding > Error while serializing geocoding response: {:#?}", e);
+                exit(-1);
+            },
+        },
+
         Err(e) => {
-            eprintln!("failed to get geocoding: {:#?}", e);
+            eprintln!("ERROR main::get_geocoding > http::get returned error: {:#?}", e);
             exit(-1);
         }
-    };
-
-    println!("{:#?}", geo);
+    } 
+    
+    println!("{:#?}", r);
 }
 
 fn get_weather() {
@@ -71,15 +69,23 @@ fn get_weather() {
     //println!("{:#?}", http::get(&weather_url));
 }
 
-fn main() {
-    let home_json_path: &Path = Path::new("/home/dio/.config/weather/config.json");
+
     
     if args().len() > 1 {
         let data: APIData = get_geocoding(cli::matches());
         println!("{:#?}", data);
 
     } else if home_json_path.exists() {
+        
+        let c: String = match cache::read_cache(&home_json_path) {
+            OK(s) => s,
+            Err(e) => {
+                eprintln!("");
+                exit(-1)
+            }
+        };
 
+        let data: APIData = ;
     } else {
         panic!("none arguments were provided and neither cache to use.");
     }
