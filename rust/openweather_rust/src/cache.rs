@@ -32,15 +32,7 @@ pub fn write_cache(path: &Path, new_cache: String) {
         };
     } 
     
-    let content: String = match serde_json::to_string_pretty(&new_cache) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("ERROR cache::write_cache > failed to serialize new cache values: {:#?}", e);
-            exit(-1);
-        }
-    };
-    
-    match fs::write(path, content) {
+    match fs::write(path, new_cache) {
         Ok(_) => println!("New cache wrote succefully."),
         Err(e) => {
             eprintln!("ERROR cache::write_cache > failed to write to file {:#?}", e);

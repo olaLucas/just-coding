@@ -2,11 +2,10 @@ use clap::arg;
 use clap::value_parser;
 use clap::Command;
 use clap::Arg;
-use crate::apidata::APIData;
-use crate::geocoding::Geocoding;
 use std::process::exit;
+use crate::apidata::{APIData, Geocoding};
 
-pub fn matches() -> (APIData, Geocoding) {
+pub fn matches() -> APIData {
 
     let arguments: &[Arg] = &[
         arg!(appid: -a --appid <STRING> "Openweather API Key")
@@ -64,5 +63,5 @@ pub fn matches() -> (APIData, Geocoding) {
         None => "metric".to_string() 
     };
 
-    return (APIData::new(appid, units), Geocoding::new(country, 0.0, 0.0, city, String::default()));
+    return APIData::new(appid, Geocoding::new(country, 0.0, 0.0, city, String::default()), units);
 } 

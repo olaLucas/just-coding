@@ -3,20 +3,20 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 pub struct Geocoding {
-    country: String,
+    name: String,
     lat: f32,
     lon: f32,
-    name: String,
+    country: String,
     state: String
 }
 
 impl Geocoding {
     pub fn new(country: String, lat: f32, lon: f32, name: String, state: String) -> Geocoding {
         Geocoding {
-            country,
+            name,
             lat,
             lon,
-            name,
+            country,
             state
         }
     }
