@@ -5,6 +5,7 @@ use std::process::exit;
 use cache::write_cache;
 use apidata::APIData;
 use apidata::Geocoding;
+use http::get;
 use weather::Weather;
 
 pub mod http;
@@ -77,9 +78,9 @@ fn main() {
 
     if args().len() > 1 {
         
-        let data: APIData = cli::matches();
+        let mut data: APIData = cli::matches();
         data.set_geo(&get_geocoding(&data));
-       
+
         let new_cache: String = serde_json::to_string_pretty(&data).unwrap();
         write_cache(home_json_path, new_cache);
 

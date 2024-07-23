@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct APIData {
     appid: String,
     geocoding: Geocoding,
@@ -44,13 +43,12 @@ impl APIData {
          &self.geocoding.state
     }
 
-    pub fn set_geo(mut self, g: &Geocoding) {
+    pub fn set_geo(&mut self, g: &Geocoding) {
        self.geocoding = Geocoding::from(g); 
     }
 }
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Geocoding {
     name: String,
     lat: f32,
