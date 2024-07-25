@@ -93,7 +93,7 @@ fn main() {
         };
 
         println!("{:#?}", c);
-        println!("{:#?}", get_weather(c));
+        println!("{}", get_weather(c));
 
     } else {
         panic!("none arguments were provided and neither cache to use.");
