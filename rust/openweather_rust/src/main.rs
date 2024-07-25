@@ -63,7 +63,7 @@ fn get_weather(data: APIData) -> Current {
     let response: Current = match serde_json::from_str(&http::get(&url)) {
         Ok(w) => w,
         Err(e) => {
-            eprintln!("ERROR main::get_weather > failed to serialize Weather. {:#?}", e);
+            eprintln!("ERROR main::get_weather > failed to serialize Weather: {:#?}", e);
             exit(-1);
         }
     };
@@ -92,14 +92,7 @@ fn main() {
             },
         };
 
-        //let g: Geocoding = match serde_json::from_str(&cache::read_cache(&home_json_path)) {
-        //    Ok(g) => g,
-        //    Err(e) => {
-        //        eprintln!("ERROR main > failed to serialize Geocoding: {:#?}", e);
-        //        exit(-1);
-        //    }
-        //};
-
+        println!("{:#?}", c);
         println!("{:#?}", get_weather(c));
 
     } else {

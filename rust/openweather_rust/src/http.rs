@@ -6,7 +6,10 @@ pub fn get(url: &str) -> String {
     match http.get(url).send() {
         Ok(res) => {
             match res.text() {
-                Ok(s) => s,
+                Ok(s) => {
+                    println!("http::get > response: {:#?}", s);
+                    s
+                },
 
                 Err(e) => {
                     eprintln!("http::get > Error while trying to extract text from response: {:#?}", e);

@@ -37,14 +37,43 @@ struct Coord {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+struct Wind {
+    speed: f32,
+    deg: f32,
+    gust: f32
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Rain {
+    _1h: f32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Clouds {
+    all: i32
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Current {
-    main: Main,
-    sys: Sys,
     coord: Coord,
-    weather: Vec<Weather>,
+    
     base: String,
-    visibility: String,
-    id: String,
+    
+    weather: Vec<Weather>,
+    main: Main,
+
+    visibility: i32,
+    
+    // wind: Wind,
+    //rain: Rain,
+    clouds: Clouds,
+    
+    dt: i32,
+
+    sys: Sys,
+    
     timezone: i32,
-    cod: u8,
+    id: i32,
+    name: String,
+    cod: i32,
 }
