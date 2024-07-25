@@ -3,24 +3,53 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
-pub struct Weather {
-    date: String,
-    weather: (String, String),
-    sunset: String,
-    sunrise: String,
-        
-    // max, curr, min
-    temp: (f32, f32, f32),
+struct Main {
+    temp: f32,
     feels_like: f32,
+    temp_min: f32,
+    temp_max: f32,
+    pressure: f32,
     humidity: u8,
+    sea_level: i32,
+    grnd_level: i32
 }
 
-impl Weather {
-    pub fn new(date: String, weather: (String, String), sunset: String, sunrise: String, temp: (f32, f32, f32), feels_like: f32, humidity: u8) -> Weather {
-        Weather {
-            date, weather, sunset, 
-            sunrise, temp, feels_like,
-            humidity,
-        }
-    }
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+struct Sys {
+    r#type: u8,
+    id: i32,
+    country: String,
+    sunrise: i32,
+    sunset: i32
 }
+
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+struct Weather {
+    id: i32,
+    main: String,
+    description: String,
+    icon: String,
+}
+
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+struct Coord {
+    lat: f32,
+    lon: f32
+}
+
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+pub struct Current {
+    main: Main,
+    sys: Sys,
+    coord: Coord,
+    weather: Vec<Weather>,
+    base: String,
+    visibility: String,
+    id: String,
+    timezone: i32,
+    cod: u8,
+
