@@ -1,8 +1,7 @@
 use chrono::{NaiveTime, Timelike};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Main {
     temp: f32,
     feels_like: f32,
@@ -14,8 +13,7 @@ struct Main {
     grnd_level: i32
 }
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Sys {
     r#type: u8,
     id: i32,
@@ -24,8 +22,7 @@ struct Sys {
     sunset: i32
 }
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Weather {
     id: i32,
     main: String,
@@ -33,15 +30,13 @@ struct Weather {
     icon: String,
 }
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Coord {
     lat: f32,
     lon: f32
 }
 
-#[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Current {
     main: Main,
     sys: Sys,
@@ -52,4 +47,4 @@ pub struct Current {
     id: String,
     timezone: i32,
     cod: u8,
-
+}

@@ -5,8 +5,7 @@ use std::process::exit;
 use cache::write_cache;
 use apidata::APIData;
 use apidata::Geocoding;
-use http::get;
-use weather::Weather;
+use weather::Current;
 
 pub mod http;
 pub mod cli;
@@ -54,14 +53,14 @@ fn get_geocoding(data: &APIData) -> Geocoding {
     return response;
 }
 
-fn get_weather(data: APIData) -> Weather {
+fn get_weather(data: APIData) -> Current {
 
     let url: String = format!(
         "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
         data.get_lat(), data.get_lon(), data.get_appid()
     );
 
-    let response: Weather = match serde_json::from_str(&http::get(&url)) {
+    let response: Current = match serde_json::from_str(&http::get(&url)) {
         Ok(w) => w,
         Err(e) => {
             eprintln!("ERROR main::get_weather > failed to serialize Weather. {:#?}", e);
