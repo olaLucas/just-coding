@@ -18,12 +18,7 @@ struct Main {
 
 impl Display for Main {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Temperatures: (Min: {0}, Curr: {1}, Max: {2})\n
-            Feels like: {3}\n
-            Pressure: {4}\n
-            Humidity: {5}\n
-            Sea level: {6}\n
-            Ground level: {7}",  
+        write!(f, "Temperatures: (Min: {0}, Curr: {1}, Max: {2})\nFeels like: {3}\nPressure: {4}\nHumidity: {5}\nSea level: {6}\nGround level: {7}",  
             self.temp_min, 
             self.temp, 
             self.temp_max, 
@@ -47,12 +42,7 @@ struct Sys {
 
 impl Display for Sys {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "<< Sys >>\n
-            Type: {0}\n
-            ID: {1}\n
-            Country: {2}\n
-            Sunrise: {3}\n
-            Sunset: {4}\n",
+        write!(f, "Type: {0}\nID: {1}\nCountry: {2}\nSunrise: {3}\nSunset: {4}",
             self.r#type,
             self.id,
             self.country,
@@ -72,11 +62,7 @@ struct Weather {
 
 impl Display for Weather {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "<< Weather >>\n
-            ID: {0}\n
-            Main: {1}\n
-            Description: {2}\n
-            Icon: {3}",
+        write!(f, "ID: {0}\nMain: {1}\nDescription: {2}\nIcon: {3}",
             self.id,
             self.main,
             self.description,
@@ -111,7 +97,7 @@ struct Rain {
 
 impl Display for Rain {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Rain: {}", self._1h)
+        write!(f, "Rain: {}\n", self._1h)
     }
 }
 
@@ -147,18 +133,7 @@ pub struct Current {
 
 impl Display for Current {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Coord: {}\n
-            Weather: {}\n
-            Main: {}\n
-            Clouds: {}\n
-            Sys: {}\n
-            Base: {}\n
-            Date & Time: {}\n
-            Visibility: {}\n
-            Timezone: {}\n
-            ID: {}\n
-            Name: {}\n
-            cod: {}",
+        write!(f, "Coord: {}\nWeather: {}\nMain: {}\nClouds: {}\nSys: {}\nBase: {}\nDate & Time: {}\nVisibility: {}\nTimezone: {}\nID: {}\nName (City): {}\ncod: {}",
             self.coord,
             self.weather[0],
             self.main,
