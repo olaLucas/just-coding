@@ -16,7 +16,7 @@ class Node {
 
     void set_data(const int d) {data = d;}
     void set_prox(Node & p) {prox = &p;}
-    void set_prox_null() {prox = NULL;}
+    void set_prox(std::nullptr_t) {prox = NULL;}
 };
 
 class Stack {
@@ -94,10 +94,8 @@ int Stack::pop() {
     data = nav->get_data();
     delete nav;
     
-    ant->set_prox_null();
+    ant->set_prox(nullptr);
   }
-
-
 
   return data;
 }

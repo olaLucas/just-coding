@@ -1,25 +1,36 @@
 #include <cstdio>
-#include <iostream>
-#include <ostream>
+#include <cstdlib>
+#include <stdlib.h>
 #include "lib/stack.cpp"
 
-void print_stack(Stack * s){
-  for (int i = 0; i < s->get_len(); i++) {
-    std::cout << "Value: " << s->pop() << std::endl;
-  }  
+#define ARRAY_SIZE 1024
+#define RANGE 100000000
+
+void filling_array(int array[]) {
+  for (int i = 0; i < ARRAY_SIZE; i++) {
+    array[i] = rand();  
+  }
+}
+
+void print_arr(const int array[]) {
+  for (int i = 0; i < ARRAY_SIZE; i++) {
+    printf("%d: %d\n", i, array[i]); 
+  }
 }
 
 int main(void) {
-  int array[] = {10, 20, 30, 40, 50};
-  int arr_size = sizeof(array) / sizeof(int);
-  Stack p;
   
-  std::cout << "arr_size: " << arr_size << std::endl; 
-  for (int i = 0; i < arr_size; i++) {
+  int array[ARRAY_SIZE];
+  filling_array(array);  
+  
+  Stack p;
+  for (int i = 0; i < ARRAY_SIZE; i++) {
     p.insert(array[i]);
   }
 
-  print_stack(&p);
+  for (int i = 0; i < ARRAY_SIZE; i++) {
+    printf("popping %d: %d\n", i, p.pop()); 
+  }
 
   return 0;
 } 
