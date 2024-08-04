@@ -4,8 +4,8 @@
 class Node {
   private:
     int data;
-   Node * prox;
-
+    Node * prox;
+    
   public:
     Node() : data(0), prox(NULL) {}
     Node(const int d) : data(d), prox(NULL) {}  
@@ -16,6 +16,7 @@ class Node {
 
     void set_data(const int d) {data = d;}
     void set_prox(Node & p) {prox = &p;}
+    void set_prox_null() {prox = NULL;}
 };
 
 class Stack {
@@ -33,10 +34,12 @@ class Stack {
 
     int insert(const int data);
     int pop();
+    
+    bool empty();
 
-    Node * get_beg();
-    Node * get_end();
-    int get_len();
+    Node * get_beg() {return beg;}
+    Node * get_end() {return end;}
+    int get_len() {return len;}
     
     int clear();
 };
@@ -67,46 +70,44 @@ int Stack::insert(const int d) {
 }
 
 int Stack::pop() {
-  if (beg == NULL) {
-    std::cout << "stack empty." << std::endl;
+  if (empty()) {
     return -1;
-  }
+  } 
 
+  int data = 0;
   Node * nav = beg;
-  if (nav->get_prox() == NULL) { // first element
-    delete nav;
-    beg = NULL; end = NULL;
+
+  // first element
+  if (beg->get_prox() == NULL) {
+    data = beg->get_data();
+    delete beg;
+    beg = NULL;
     len--;
+    
+  } else {
+    Node * ant = NULL;
+    while (nav->get_prox() != NULL) { // procurando pelo ultimo elemento
+      ant = nav;
+      nav = nav->get_prox(); 
+    }
 
-    return 0;
+    data = nav->get_data();
+    delete nav;
+    
+    ant->set_prox_null();
   }
 
-  while (nav->get_prox() != end) {
-    nav = nav->get_prox();
-  }
 
-  if (end != NULL) {
-    delete end;
-    end = nav;
-  }
 
-  return 0;
+  return data;
 }
 
-Node * Stack::get_beg() {
+bool Stack::empty() {
   if (beg == NULL) {
-    std::cout << "Stack::get_beg() > stack empty." << std::endl;
+    return true;
+  } else {
+    return false;
   }
-
-  return beg;
-}
-
-Node * Stack::get_end() {
-  if (end == NULL) {
-    std::cout << "Stack::get_end() > stack empty." << std::endl;
-  }
-
-  return end;
 }
 
 int Stack::clear() {
