@@ -13,6 +13,14 @@ pub mod cache;
 pub mod apidata;
 pub mod weather;
 
+fn print_verbose(c: &Current) -> String {
+    format!("City: {} | Weather: {}", c.name, c.weather[0].main)
+}
+
+fn print_i3_bar(c: &Current) -> String {
+    format!("{} | {} | {}", c.name, c.weather[0].main, c.main.temp)
+}
+
 fn get_rid_of_arrays(json: serde_json::Value) -> String {
 
     match serde_json::to_string_pretty(&json[0]) {
@@ -28,7 +36,7 @@ fn get_geocoding(data: &APIData) -> Geocoding {
 
     let url = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={},{}&appid={}",
-       data.get_city(), data.get_country(), data.get_appid() 
+       data.geocoding.name, data.geocoding.country, data.appid 
     );
 
     let response: Geocoding = match serde_json::from_str(&http::get(&url)) {
@@ -53,11 +61,11 @@ fn get_geocoding(data: &APIData) -> Geocoding {
     return response;
 }
 
-fn get_weather(data: APIData) -> Current {
+fn get_weather(data: &APIData) -> Current {
 
     let url: String = format!(
         "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
-        data.get_lat(), data.get_lon(), data.get_appid()
+        data.geocoding.lat, data.geocoding.lon, data.appid
     );
 
     let response: Current = match serde_json::from_str(&http::get(&url)) {
@@ -78,7 +86,7 @@ fn main() {
     if args().len() > 1 {
         
         let mut data: APIData = cli::matches();
-        data.set_geo(&get_geocoding(&data));
+        data.geocoding = get_geocoding(&data);
 
         let new_cache: String = serde_json::to_string_pretty(&data).unwrap();
         write_cache(home_json_path, new_cache);
@@ -93,7 +101,7 @@ fn main() {
         };
 
         println!("{:#?}", c);
-        println!("{}", get_weather(c));
+        println!("{}", print_i3_bar(&get_weather(&c)));
 
     } else {
         panic!("none arguments were provided and neither cache to use.");

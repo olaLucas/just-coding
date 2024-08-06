@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct APIData {
-    appid: String,
-    geocoding: Geocoding,
-    units: String
+    pub appid: String,
+    pub geocoding: Geocoding,
+    pub units: String
 }
 
 impl APIData {
@@ -15,46 +15,15 @@ impl APIData {
             units,
         }
     }
-    pub fn get_appid(&self) -> &str {
-        &self.appid
-    }    
-
-    pub fn get_units(&self) -> &str {
-        &self.units
-    }
-
-    pub fn get_country(&self) -> &str {
-        &self.geocoding.country
-    }
-
-    pub fn get_lat(&self) -> f32 {
-        self.geocoding.lat
-    }
-
-    pub fn get_lon(&self) -> f32 {
-         self.geocoding.lon
-    }
-
-    pub fn get_city(&self) -> &str {
-        &self.geocoding.name
-    }
-
-    pub fn get_state(&self) -> &str {
-         &self.geocoding.state
-    }
-
-    pub fn set_geo(&mut self, g: &Geocoding) {
-       self.geocoding = Geocoding::from(g); 
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Geocoding {
-    name: String,
-    lat: f32,
-    lon: f32,
-    country: String,
-    state: String
+   pub name: String,
+   pub lat: f32,
+   pub lon: f32,
+   pub country: String,
+   pub state: String
 }
 
 impl Geocoding {
@@ -77,24 +46,4 @@ impl Geocoding {
             state: String::from(&g.state),
         }
     }
-
-    //pub fn get_country(&self) -> &str {
-    //    &self.country
-    //}
-    //
-    //pub fn get_lat(&self) -> f32 {
-    //    self.lat
-    //}
-    //
-    //pub fn get_lon(&self) -> f32 {
-    //     self.lon
-    //}
-    //
-    //pub fn get_city(&self) -> &str {
-    //    &self.name
-    //}
-    //
-    //pub fn get_state(&self) -> &str {
-    //     &self.state
-    //}
 }
