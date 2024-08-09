@@ -20,7 +20,7 @@ pub fn read_cache(path: &Path) -> String {
     return content;
 }
 
-pub fn write_cache(path: &Path, new_cache: String) {
+pub fn write_cache(path: &Path, new_cache: &String) {
     
     if !path.exists() {
         match fs::File::create(path) {

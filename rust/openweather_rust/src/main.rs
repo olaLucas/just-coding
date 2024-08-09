@@ -1,3 +1,4 @@
+use core::panic;
 use std::env::args;
 use std::path::Path;
 use std::process::exit;
@@ -79,29 +80,69 @@ fn get_weather(data: &APIData) -> Current {
     return response;
 }
 
+fn cache_weather(weather: &Current) {
+    let path: &Path = &Path::new("/home/dio/.config/weather/weather.json");
+    
+    if !path.exists() {
+        eprintln!("weather cache file does not exist.");
+        exit(-1);
+    }
+
+    let cache: String = serde_json::to_string_pretty(&weather).unwrap();
+    write_cache(path, &cache);
+}
+
+fn cache_apidata(data: &APIData) {
+    let path: &Path = &Path::new("/home/dio/.config/weather/config.json");   
+    
+    if !path.exists() {
+        eprintln!("api cache file does not exist.");
+        exit(-1);
+    }
+
+    let cache: String = serde_json::to_string_pretty(&data).unwrap();
+    write_cache(path, &cache);
+}
+
+fn use_args() {
+    let mut data: APIData = cli::matches();
+    data.geocoding = get_geocoding(&data);
+        
+    // need to make get
+    
+    // caching
+    cache_apidata(&data);
+    // cache_weather(&weather);
+}
+
+fn use_cache() {
+
+    let apidata_cache: &Path = &Path::new("/home/dio/.config/weather/config.json");
+    let c: APIData = match serde_json::from_str(&cache::read_cache(&apidata_cache)) {
+        Ok(a) => a,
+        Err(e) => {
+            eprintln!("ERROR main > failed to serialize APIData: {:#?}", e);
+            exit(-1)
+        },
+    };
+
+    let weather: Current = get_weather(&c);
+
+    println!("{:#?}", c);
+    println!("{}", print_i3_bar(&weather));
+
+    // caching weather
+    cache_weather(&weather);
+}
 
 fn main() {
-    let home_json_path: &Path = &Path::new("/home/dio/.config/weather/config.json");
+    let apidata_cache: &Path = &Path::new("/home/dio/.config/weather/config.json");
 
     if args().len() > 1 {
-        
-        let mut data: APIData = cli::matches();
-        data.geocoding = get_geocoding(&data);
+        use_args();
 
-        let new_cache: String = serde_json::to_string_pretty(&data).unwrap();
-        write_cache(home_json_path, new_cache);
-
-    } else if home_json_path.exists() { 
-        let c: APIData = match serde_json::from_str(&cache::read_cache(&home_json_path)) {
-            Ok(a) => a,
-            Err(e) => {
-                eprintln!("ERROR main > failed to serialize APIData: {:#?}", e);
-                exit(-1)
-            },
-        };
-
-        println!("{:#?}", c);
-        println!("{}", print_i3_bar(&get_weather(&c)));
+    } else if apidata_cache.exists() { 
+        use_cache();
 
     } else {
         panic!("none arguments were provided and neither cache to use.");
