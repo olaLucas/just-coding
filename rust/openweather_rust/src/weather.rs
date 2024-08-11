@@ -15,8 +15,8 @@ pub struct Main {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Sys {
-   pub r#type: u8,
-   pub id: i32,
+   //pub r#type: u8,
+   //pub id: i32,
    pub country: String,
    pub sunrise: i32,
    pub sunset: i32

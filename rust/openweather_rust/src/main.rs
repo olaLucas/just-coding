@@ -14,10 +14,6 @@ pub mod cache;
 pub mod apidata;
 pub mod weather;
 
-fn print_verbose(c: &Current) -> String {
-    format!("City: {} | Weather: {}", c.name, c.weather[0].main)
-}
-
 fn print_i3_bar(c: &Current) -> String {
     format!("{} | {} | {}", c.name, c.weather[0].main, c.main.temp)
 }
@@ -33,14 +29,12 @@ fn get_rid_of_arrays(json: serde_json::Value) -> String {
     }
 }
 
-fn check_get_errors(response: &String) -> bool {
+fn check_get_errors(response: &String) {
     let response: serde_json::Value = serde_json::from_str(&response).unwrap();
     if response.get("cod").unwrap() != 200 {
         eprintln!("main::check_get_errors > Server returned an error: {:#?}", response);
-        return true;
+        exit(-1);
     }
-
-    return false;
 }
 
 fn get_geocoding(data: &APIData) -> Geocoding {
@@ -75,19 +69,20 @@ fn get_geocoding(data: &APIData) -> Geocoding {
 fn get_weather(data: &APIData) -> Current {
 
     let url: String = format!(
-        "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
-        data.geocoding.lat, data.geocoding.lon, data.appid
+        "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&units={}&appid={}",
+        data.geocoding.lat, data.geocoding.lon, data.units, data.appid
     );
 
+    
     let response: String = http::get(&url);
-    if check_get_errors(&response) {
-        exit(-1);
-    }
+    check_get_errors(&response);
 
-    let response: Current = match serde_json::from_str(&http::get(&url)) {
+    let response: String = http::get(&url);
+    let response: Current = match serde_json::from_str(&response) {
         Ok(w) => w,
         Err(e) => {
             eprintln!("ERROR main::get_weather > failed to serialize Weather: {:#?}", e);
+            eprintln!("JSON response: {:#?}", response);
             exit(-1);
         }
     };
@@ -124,46 +119,31 @@ fn cache_apidata(data: &APIData) {
     write_cache(path, &cache);
 }
 
-fn use_args() {
-    let mut data: APIData = cli::matches();
-    data.geocoding = get_geocoding(&data);
-        
-    let weather: Current = get_weather(&data);
-
-    // caching
-    cache_apidata(&data);
-    cache_weather(&weather);
-    println!("{}", print_i3_bar(&weather));
-}
-
-fn use_cache() {
-
-    let apidata_cache: &Path = &Path::new("/home/dio/.config/weather/config.json");
-
-    let c: APIData = match serde_json::from_str(&cache::read_cache(&apidata_cache)) {
-        Ok(a) => a,
-        Err(e) => {
-            eprintln!("ERROR main > failed to serialize APIData: {:#?}", e);
-            exit(-1)
-        },
-    };
-
-    let weather: Current = get_weather(&c);
-
-    println!("{}", print_i3_bar(&weather));
-    cache_weather(&weather);
-}
-
 fn main() {
     let apidata_cache: &Path = &Path::new("/home/dio/.config/weather/config.json");
-
+    let mut data: APIData;
+    
     if args().len() > 1 {
-        use_args();
+        data = cli::matches();
+        data.geocoding = get_geocoding(&data);
+        cache_apidata(&data);
 
     } else if apidata_cache.exists() { 
-        use_cache();
+        data = match serde_json::from_str(&cache::read_cache(&apidata_cache)) {
+            Ok(a) => a,
+            Err(e) => {
+                eprintln!("main > Failed to serialize APIData: {:#?}", e);
+                exit(-1);
+            }
+        };
 
     } else {
-        panic!("none arguments were provided and neither cache to use.");
+        eprintln!("none arguments were provided and neither cache to use.");
+        exit(-1);
     }
+
+    let response: Current = get_weather(&data);
+    println!("{}", print_i3_bar(&response));
+
+    cache_weather(&response);
 }
