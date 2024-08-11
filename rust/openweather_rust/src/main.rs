@@ -1,7 +1,7 @@
-use core::panic;
 use std::env::args;
 use std::path::Path;
 use std::process::exit;
+use std::fs;
 
 use cache::write_cache;
 use apidata::APIData;
@@ -31,6 +31,16 @@ fn get_rid_of_arrays(json: serde_json::Value) -> String {
             exit(-1);
         }
     }
+}
+
+fn check_get_errors(response: &String) -> bool {
+    let response: serde_json::Value = serde_json::from_str(&response).unwrap();
+    if response.get("cod").unwrap() != 200 {
+        eprintln!("main::check_get_errors > Server returned an error: {:#?}", response);
+        return true;
+    }
+
+    return false;
 }
 
 fn get_geocoding(data: &APIData) -> Geocoding {
@@ -69,6 +79,11 @@ fn get_weather(data: &APIData) -> Current {
         data.geocoding.lat, data.geocoding.lon, data.appid
     );
 
+    let response: String = http::get(&url);
+    if check_get_errors(&response) {
+        exit(-1);
+    }
+
     let response: Current = match serde_json::from_str(&http::get(&url)) {
         Ok(w) => w,
         Err(e) => {
@@ -84,8 +99,13 @@ fn cache_weather(weather: &Current) {
     let path: &Path = &Path::new("/home/dio/.config/weather/weather.json");
     
     if !path.exists() {
-        eprintln!("weather cache file does not exist.");
-        exit(-1);
+        match fs::File::create(path) {
+            Ok(_) => println!("file created: $HOME/.config/weather/weather.json"),
+            Err(e) => {
+                eprintln!("main::cache_weather > failed to create weather.json: {:#?}", e);
+                return;
+            }
+        };     
     }
 
     let cache: String = serde_json::to_string_pretty(&weather).unwrap();
@@ -108,16 +128,18 @@ fn use_args() {
     let mut data: APIData = cli::matches();
     data.geocoding = get_geocoding(&data);
         
-    // need to make get
-    
+    let weather: Current = get_weather(&data);
+
     // caching
     cache_apidata(&data);
-    // cache_weather(&weather);
+    cache_weather(&weather);
+    println!("{}", print_i3_bar(&weather));
 }
 
 fn use_cache() {
 
     let apidata_cache: &Path = &Path::new("/home/dio/.config/weather/config.json");
+
     let c: APIData = match serde_json::from_str(&cache::read_cache(&apidata_cache)) {
         Ok(a) => a,
         Err(e) => {
@@ -128,10 +150,7 @@ fn use_cache() {
 
     let weather: Current = get_weather(&c);
 
-    println!("{:#?}", c);
     println!("{}", print_i3_bar(&weather));
-
-    // caching weather
     cache_weather(&weather);
 }
 
