@@ -188,16 +188,21 @@ fn main() {
         exit(-1);
     }
 
-    let cached_weather: Current = read_cache_weather();
-    if check_hour(&cached_weather) {
-        println!("requesting weather...");
-        let response: Current = get_weather(&data);            
-        
-        println!("{:#?}", response);
-        cache_weather(&response);
+    let weather: Current = {
+        let cached_weather: Current = read_cache_weather();
+        let weather: Current;
 
-    } else {
-        println!("using cached weather...");
-        println!("{:#?}", cached_weather);
-    }
+        if check_hour(&cached_weather) {
+            println!("requesting weather...");
+            weather = get_weather(&data);
+            cache_weather(&weather);
+        } else {
+            println!("using cached weather...");
+            weather = cached_weather;
+        }
+
+        weather
+    };
+
+    println!("{:#?}", weather);
 }
