@@ -1,11 +1,13 @@
 use std::env::args;
 use std::path::Path;
 use std::process::exit;
+use std::time;
 use std::fs;
 
 use cache::write_cache;
 use apidata::APIData;
 use apidata::Geocoding;
+use chrono::Duration;
 use weather::Current;
 
 pub mod http;
@@ -17,6 +19,23 @@ pub mod weather;
 fn print_i3_bar(c: &Current) -> String {
     format!("{} | {} | {}", c.name, c.weather[0].main, c.main.temp)
 }
+
+fn check_hour(c: &Current) -> bool {
+
+    const HOUR_IN_SECONDS: u64 = 3600;
+    let h: u64 = time::SystemTime::now()
+        .duration_since(time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    if h - c.dt < HOUR_IN_SECONDS {
+        println!("less than HOUR_IN_SECONDS");
+        return false;
+    } else {
+        println!("greater than HOUR_IN_SECONDS");
+        return true;
+    }
+} 
 
 fn get_rid_of_arrays(json: serde_json::Value) -> String {
 
@@ -107,6 +126,23 @@ fn cache_weather(weather: &Current) {
     write_cache(path, &cache);
 }
 
+fn read_cache_weather() -> Current {
+    let path: &Path = &Path::new("/home/dio/.config/weather/weather.json");
+
+    if !path.exists() {
+        eprintln!("main::read_cache_weather > weather.json does not exist.");
+        exit(-1);
+    }
+
+    match serde_json::from_str(&cache::read_cache(path)) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("main::read_cache_weather > error while serializing Current: {:#?}", e);
+            exit(-1);
+        }
+    }
+}
+
 fn cache_apidata(data: &APIData) {
     let path: &Path = &Path::new("/home/dio/.config/weather/config.json");   
     
@@ -119,6 +155,23 @@ fn cache_apidata(data: &APIData) {
     write_cache(path, &cache);
 }
 
+fn read_cache_apidata() -> APIData {
+    let path: &Path = &Path::new("/home/dio/.config/weather/config.json");
+
+    if !path.exists() {
+        eprintln!("main::read_cache_weather > config.json does not exist.");
+        exit(-1);
+    }
+
+    match serde_json::from_str(&cache::read_cache(path)) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("main::read_cache_weather > error while serializing APIData: {:#?}", e);
+            exit(-1);
+        }
+    }
+}
+
 fn main() {
     let apidata_cache: &Path = &Path::new("/home/dio/.config/weather/config.json");
     let mut data: APIData;
@@ -129,21 +182,22 @@ fn main() {
         cache_apidata(&data);
 
     } else if apidata_cache.exists() { 
-        data = match serde_json::from_str(&cache::read_cache(&apidata_cache)) {
-            Ok(a) => a,
-            Err(e) => {
-                eprintln!("main > Failed to serialize APIData: {:#?}", e);
-                exit(-1);
-            }
-        };
-
+        data = read_cache_apidata(); 
     } else {
         eprintln!("none arguments were provided and neither cache to use.");
         exit(-1);
     }
 
-    let response: Current = get_weather(&data);
-    println!("{}", print_i3_bar(&response));
+    let cached_weather: Current = read_cache_weather();
+    if check_hour(&cached_weather) {
+        println!("requesting weather...");
+        let response: Current = get_weather(&data);            
+        
+        println!("{:#?}", response);
+        cache_weather(&response);
 
-    cache_weather(&response);
+    } else {
+        println!("using cached weather...");
+        println!("{:#?}", cached_weather);
+    }
 }

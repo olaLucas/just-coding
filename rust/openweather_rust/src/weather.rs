@@ -1,4 +1,3 @@
-use chrono::{NaiveTime, Timelike};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -65,7 +64,7 @@ pub struct Current {
    pub sys: Sys,
 
    pub base: String,
-   pub dt: i32,
+   pub dt: u64,
    pub visibility: i32,
    pub timezone: i32,
    pub id: i32,
