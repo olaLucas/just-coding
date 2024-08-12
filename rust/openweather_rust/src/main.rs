@@ -7,7 +7,6 @@ use std::fs;
 use cache::write_cache;
 use apidata::APIData;
 use apidata::Geocoding;
-use chrono::Duration;
 use weather::Current;
 
 pub mod http;
