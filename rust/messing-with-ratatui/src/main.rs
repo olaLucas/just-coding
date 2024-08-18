@@ -1,4 +1,4 @@
-use ratatui::{self as rat, widgets::Borders};
+use ratatui::{self as rat, style::Stylize, widgets::{Borders, Paragraph}, Frame};
 use rat::prelude::CrosstermBackend;
 
 fn main() {
@@ -16,5 +16,10 @@ fn main() {
             .border_type(ratatui::widgets::BorderType::Rounded)
         );
 
-    let _ = term.draw(|f| f.render_widget(p, rat::layout::Rect::new(2, 2, header.len().try_into().unwrap(), header.len().try_into().unwrap())));
+    loop {
+        let _ = term.draw(|frame| {
+                frame.render_widget(&p, frame.area());
+            }
+        );
+    }
 }
