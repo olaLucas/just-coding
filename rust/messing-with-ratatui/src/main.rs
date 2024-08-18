@@ -1,25 +1,55 @@
-use ratatui::{self as rat, style::Stylize, widgets::{Borders, Paragraph}, Frame};
-use rat::prelude::CrosstermBackend;
+use std::io::stdout;
+use std::time::Duration;
+
+use ratatui::{
+    backend::CrosstermBackend,
+    crossterm::{
+        terminal::{
+            enable_raw_mode,
+            disable_raw_mode,
+            EnterAlternateScreen,
+            LeaveAlternateScreen,
+        },
+        ExecutableCommand,
+        event::{
+            self,
+            KeyCode,
+            KeyEventKind,
+        },
+    },
+
+
+    widgets::Paragraph,
+    Terminal,
+};
 
 fn main() {
-    let back = CrosstermBackend::new(std::io::stdout());
-    let mut term = rat::Terminal::new(back).unwrap();
-    
-    let header = "First ratatui program";
-    let text = "Hello, world!";
+    stdout().execute(EnterAlternateScreen).unwrap();
+    enable_raw_mode().unwrap();
 
-    let p = rat::widgets::Paragraph::new(text)
-        .style(rat::style::Style::default().fg(rat::style::Color::Red))
-        .block(rat::widgets::Block::default()
-            .borders(Borders::all())
-            .title(header)
-            .border_type(ratatui::widgets::BorderType::Rounded)
-        );
+    let mut term = Terminal::new(
+        CrosstermBackend::new(stdout())
+    ).unwrap();
+
+    term.clear().unwrap();
 
     loop {
-        let _ = term.draw(|frame| {
-                frame.render_widget(&p, frame.area());
+        term.draw(|frame| {
+            frame.render_widget(
+                Paragraph::new("Hello, world! (presss 'q' to quit)."),
+                frame.area()
+            )
+        }).unwrap();
+
+        if event::poll(Duration::from_millis(16)).unwrap() {
+            if let event::Event::Key(key) = event::read().unwrap() {
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
+                    break;
+                }
             }
-        );
+        }
     }
+
+    disable_raw_mode().unwrap();
+    stdout().execute(LeaveAlternateScreen).unwrap();
 }
