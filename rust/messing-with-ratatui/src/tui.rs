@@ -1,5 +1,5 @@
 use std::io;
-use ratatui::{self as rat, style::Stylize, widgets::Paragraph};
+use ratatui::{self as rat, style::Stylize};
 
 pub struct App {
     counter: i8,
@@ -88,7 +88,7 @@ impl rat::widgets::Widget for &App {
             self.counter.to_string().yellow(),
         ])]);
 
-        Paragraph::new(center_text)
+        rat::widgets::Paragraph::new(center_text)
             .centered()
             .block(block)
             .render(area, buf);
