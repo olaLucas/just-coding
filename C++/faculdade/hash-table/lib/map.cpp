@@ -5,53 +5,25 @@
 #include <string>
 #define ARRAY_LENGTH 1024  
 
-struct Pessoa {
-  std::string nome = "";
-  std::string genero = "";
-  int idade = 0;
-
-  bool operator==(const struct Pessoa& p) const {
-    return (nome == p.nome) && (idade == p.idade) && (genero == p.genero);
-  }
-  
-  bool operator!=(const struct Pessoa& p) const {
-    return (nome != p.nome) || (idade != p.idade) || (genero != p.genero);
-  }
-};
-
-std::ostream& operator<<(std::ostrstream& os, const struct Pessoa& p) {
-  return os << "Nome: " << p.nome << std::endl 
-            << "Gênero: " << p.genero << std::endl
-            << "Idade: " << p.idade << std::endl;
-}
-
 struct Node {
-  struct Pessoa data;
+  std::string data = std::string();
   struct Node * prox = nullptr;
 };
 
 
 std::ostream& operator<<(std::ostrstream& os, const struct Node& n) {
-  return os << "data: " << &n.data << std::endl
+  return os << "data: " << n.data << std::endl
             << "prox: " << n.prox << std:: endl;
 }
-
 
 class map {
 public:
   map();
-  map(map &&) = default;
-  map(const map &) = default;
-  map &operator=(map &&) = default;
-  map &operator=(const map &) = default;
-  ~map();
+ ~map();
 
-  void show();
-  void insert(const struct Pessoa p);
-  struct Pessoa remove(const std::string x);
-  struct Pessoa has(const std::string x);
-  long int hash(const std::string x);
-  void clear();
+  void insert(std::string str);
+  std::string remove(const std::string x);
+  unsigned int hash(const std::string x);
 
 private:
   int len = 0;
@@ -64,83 +36,85 @@ map::map() {
 map::~map() {
 }
 
-void map::show() {
-  if (len < 1) {
-    std::cout << "map::show() > the map is empty" << std::endl;
+void map::insert(const std::string str) {
+  if (str == "") {
+    std::cout << "map::insert() > Empty str." << std::endl;
     return;
   }
 
-  for (int i = 0; i < len; i++) {
-    std::cout << i << " " << &content[i] << std::endl;
+  const int h = hash(str);
+  if (h == -1) {
+    std::cout << "map::insert() > Hash function returned -1" << std::endl;
+    return;
   }
-}
 
-void map::insert(const struct Pessoa x) {
-  const int h = hash(x.nome);
-  if (content[h].data != x && content[h].prox == nullptr) {
-    content[h].data = x;
-  } else if (content[h].data != x) { 
-    if (content[h].prox != nullptr) {
-      Node * nav = nullptr;
+  if (content[h].data.empty()) {
+    content[h].data = str;
+    len++;
+  } else {
+    if (content[h].prox == nullptr) {
+      content[h].prox = new Node {str, nullptr};
+      len++;
+    } else {
+      struct Node * nav = content[h].prox;
       while (nav->prox != nullptr) {
         nav = nav->prox;
       }
 
-      nav->prox = new Node {x, nullptr};
-    } else {
-      content[h].prox = new Node {x, nullptr};  
+      nav->prox = new Node {str, nullptr};
+      len++;
     }
   }
-
-  len++;
 }
 
-struct Pessoa map::remove(const std::string x) {
-  struct Pessoa target = Pessoa();
+std::string map::remove(const std::string x) {
+  std::string target = std::string();
 
   if (len < 1) {
     std::cout << "map::remove() > map is empty." << std::endl;
-    return Pessoa();
+    return target;
   }
 
   const int h = hash(x);
   
-  if (content[h].data.nome == x && content[h].prox == nullptr) {
+  if (content[h].data == x && content[h].prox == nullptr) {
     target = content[h].data;
-    content[h].data = Pessoa();
+    content[h].data = std::string();
+    len--;
   }
 
-  if (content[h].data.nome != x && content[h].prox != nullptr) {
+  if (content[h].data != x && content[h].prox != nullptr) {
     struct Node * nav = content[h].prox;
-    while (content[h].data.nome != x && content[h].prox != nullptr) {
+    while (content[h].data != x && content[h].prox != nullptr) {
       nav = nav->prox;
     }
 
-    if (nav->data.nome == x && nav->prox != nullptr) {
+    if (nav->data == x && nav->prox != nullptr) {
       struct Node * prox_node = nav->prox;
-      struct Pessoa target = nav->data;
+      std::string target = nav->data;
 
       nav->prox = prox_node->prox;
       nav->data = prox_node->data;
-
+      
+      len--;
       delete prox_node;
     }   
   }
-
+  
   return target;
 }
 
-long int map::hash(const std::string x) {
+unsigned int map::hash(const std::string x) {
   if (x.empty()) {
     std::cout << "map::hash() > string empty." << std::endl;
     return -1;
   }
 
-  long int h = 1;
+  unsigned int h = 1;
   for (int i = 0; i < x.length(); i++) {
-    int t = x.at(i) * pow(3.0, (double)i);
-    h += t; 
+    unsigned int t = x.at(i) * pow(3.0, (double)i);
+    h += t;  
   }
 
-  return h / ARRAY_LENGTH;
+  return h % ARRAY_LENGTH;
 }
