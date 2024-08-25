@@ -7,29 +7,35 @@
 
 struct Pessoa {
   std::string nome = "";
-  std::string sexualidade = "";
+  std::string genero = "";
   int idade = 0;
 
   bool operator==(const struct Pessoa& p) const {
-    return (nome == p.nome) && (idade == p.idade) && (sexualidade == p.sexualidade);
+    return (nome == p.nome) && (idade == p.idade) && (genero == p.genero);
   }
-
-  std::ostream& operator<<(std::ostrstream& os, const struct Pessoa& p) {
-  return os << "Nome: " << p.nome << std::endl 
-            << "Gênero: " << p.sexualidade << std::endl
-            << "Idade: " << p.idade << std::endl;
+  
+  bool operator!=(const struct Pessoa& p) const {
+    return (nome != p.nome) || (idade != p.idade) || (genero != p.genero);
   }
 };
+
+std::ostream& operator<<(std::ostrstream& os, const struct Pessoa& p) {
+  return os << "Nome: " << p.nome << std::endl 
+            << "Gênero: " << p.genero << std::endl
+            << "Idade: " << p.idade << std::endl;
+}
 
 struct Node {
   struct Pessoa data;
   struct Node * prox = nullptr;
+};
 
-  std::ostream& operator<<(std::ostrstream& os, const struct Node& n) {
+
+std::ostream& operator<<(std::ostrstream& os, const struct Node& n) {
   return os << "data: " << &n.data << std::endl
             << "prox: " << n.prox << std:: endl;
-  }
-};
+}
+
 
 class map {
 public:
@@ -43,7 +49,7 @@ public:
   void show();
   void insert(const struct Pessoa p);
   struct Pessoa remove(const std::string x);
-  bool has(const std::string x);
+  struct Pessoa has(const std::string x);
   long int hash(const std::string x);
   void clear();
 
@@ -89,17 +95,39 @@ void map::insert(const struct Pessoa x) {
   len++;
 }
 
-std::string map::remove(const std::string x) {
+struct Pessoa map::remove(const std::string x) {
+  struct Pessoa target = Pessoa();
+
   if (len < 1) {
     std::cout << "map::remove() > map is empty." << std::endl;
-    return "";
+    return Pessoa();
   }
 
   const int h = hash(x);
   
-  if (content[h].data == x) {
-    
+  if (content[h].data.nome == x && content[h].prox == nullptr) {
+    target = content[h].data;
+    content[h].data = Pessoa();
   }
+
+  if (content[h].data.nome != x && content[h].prox != nullptr) {
+    struct Node * nav = content[h].prox;
+    while (content[h].data.nome != x && content[h].prox != nullptr) {
+      nav = nav->prox;
+    }
+
+    if (nav->data.nome == x && nav->prox != nullptr) {
+      struct Node * prox_node = nav->prox;
+      struct Pessoa target = nav->data;
+
+      nav->prox = prox_node->prox;
+      nav->data = prox_node->data;
+
+      delete prox_node;
+    }   
+  }
+
+  return target;
 }
 
 long int map::hash(const std::string x) {
