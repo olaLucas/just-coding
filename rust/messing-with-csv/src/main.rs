@@ -1,8 +1,12 @@
+// where to get the datasets:
+// https://www.datablist.com/learn/csv/download-sample-csv-files
+
 mod spreadcheet;
-use spreadcheet::{Customer, SpreadSheet};
+use spreadcheet::SpreadSheet;
 
 fn main() {
     let mut s = SpreadSheet::new();
-    s.load("customers-100000.csv");
-    
+    s.load("customers-100.csv");
+    s.sort_by_first_name();
+    println!("{}", s);
 }
