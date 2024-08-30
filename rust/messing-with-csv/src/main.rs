@@ -1,6 +1,9 @@
 // where to get the datasets:
 // https://www.datablist.com/learn/csv/download-sample-csv-files
 
+
+mod cli;
+mod tui;
 mod spreadcheet;
 use spreadcheet::SpreadSheet;
 
